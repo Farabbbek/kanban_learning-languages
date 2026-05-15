@@ -1,0 +1,24 @@
+@layer theme {
+  :root {
+    --bg: #f7f1e8;
+    --surface: #fbf7f0;
+    --text: #10100f;
+    --muted: #686159;
+    --accent: #c7462e;
+    --accent-soft: #ead8ca;
+    --border: #e2d8ca;
+    --shadow: 0 18px 56px rgba(35, 25, 16, .08);
+  }
+
+  .dark {
+    /* Optional dark mode mapped to warm cinematic tones */
+    --bg: #111111;
+    --surface: #1a1a1a;
+    --text: #f5f0e8;
+    --muted: #8b847c;
+    --accent: #e47353;
+    --accent-soft: #2a1f1b;
+    --border: #333333;
+    --shadow: 0 10px 40px rgba(0,0,0,.3);
+  }
+}
