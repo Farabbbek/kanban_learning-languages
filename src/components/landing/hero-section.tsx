@@ -3,7 +3,8 @@
 import Image, { type StaticImageData } from "next/image";
 import { type MouseEvent } from "react";
 import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
-import { ArrowUpRight, Play, Star } from "lucide-react";
+import Link from "next/link";
+import { ArrowUpRight, Play } from "lucide-react";
 
 import coastPainting from "@/utils/2.png";
 import heroBackground from "@/utils/hero2.png";
@@ -41,24 +42,22 @@ const CELESTIAL_NODES = [
   { id: 9, left: "49%", top: "46%", size: "4px", delay: 2.1 },
 ];
 
-const learners = ["AF", "MR", "SK", "NL", "JD", "YS"];
-
 interface ArtCardProps {
   alt: string;
   className: string;
   image: StaticImageData;
-  priority?: boolean;
+  preload?: boolean;
   sizes: string;
 }
 
-function ArtCard({ alt, className, image, priority, sizes }: ArtCardProps) {
+function ArtCard({ alt, className, image, preload, sizes }: ArtCardProps) {
   return (
     <div className={className}>
       <Image
         src={image}
         alt={alt}
         fill
-        priority={priority}
+        preload={preload}
         sizes={sizes}
         className="object-cover"
       />
@@ -127,7 +126,7 @@ export function HeroSection() {
   }
 
   return (
-    <section className="cinematic-hero relative min-h-screen overflow-visible pb-48 xl:pb-60">
+    <section className="cinematic-hero relative min-h-screen overflow-visible">
       {/* Cinematic transition glow — bleeds into the next section */}
       <div className="cinematic-hero-glow" aria-hidden="true" />
       <div className="hero-shell relative min-h-screen overflow-visible bg-[var(--bg)]">
@@ -137,7 +136,7 @@ export function HeroSection() {
             src={heroBackground}
             alt=""
             fill
-            priority
+            preload
             sizes="100vw"
             className="object-cover"
           />
@@ -152,8 +151,8 @@ export function HeroSection() {
         <div className="absolute bottom-[5%] right-[-8%] h-[420px] w-[680px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,200,160,0.35)_0%,rgba(220,130,160,0.18)_46%,transparent_76%)] blur-[32px] opacity-60 pointer-events-none" />
         <div className="absolute bottom-[-12%] right-[2%] h-[360px] w-[560px] rounded-full border border-dashed border-accent/[0.12] opacity-80 pointer-events-none [mask-image:linear-gradient(to_bottom,transparent_0%,black_32%,transparent_100%)]" />
         {/* Full-bottom bleed gradient — extends deeply into the next section with rich tones */}
-        <div className="absolute inset-x-[-12%] bottom-[-220px] h-[820px] bg-[linear-gradient(to_bottom,transparent_0%,rgba(250,225,210,0.25)_12%,rgba(250,210,195,0.78)_36%,rgba(245,195,175,0.85)_52%,rgba(240,185,160,0.65)_68%,transparent_100%)] pointer-events-none" />
-        <div className="absolute inset-x-[-12%] bottom-[-280px] h-[560px] bg-[radial-gradient(ellipse_at_42%_24%,rgba(240,140,110,0.55)_0%,rgba(220,120,140,0.28)_38%,transparent_72%)] blur-[50px] pointer-events-none" />
+        <div className="absolute inset-x-[-8%] bottom-[-120px] h-[300px] bg-[linear-gradient(to_bottom,transparent_0%,rgba(250,237,226,0.82)_46%,rgba(247,241,232,0.98)_100%)] pointer-events-none" />
+        <div className="absolute inset-x-[8%] bottom-[-90px] h-[220px] bg-[radial-gradient(ellipse_at_50%_0%,rgba(214,132,92,0.16)_0%,rgba(255,250,241,0.34)_42%,transparent_74%)] blur-[36px] pointer-events-none" />
 
         <motion.header
           style={{
@@ -194,13 +193,13 @@ export function HeroSection() {
           </nav>
 
           <div className="flex items-center gap-5">
-            <a
-              href="#login"
+            <Link
+              href="/login"
               className="group relative hidden rounded-full px-2 py-2 text-sm font-medium text-foreground/72 outline-none transition-colors duration-300 hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent/45 focus-visible:ring-offset-4 focus-visible:ring-offset-background sm:inline-flex"
             >
               Log In
               <span className="absolute bottom-1 left-1/2 h-px w-0 -translate-x-1/2 bg-accent/70 opacity-0 transition-[width,opacity] duration-500 ease-out group-hover:w-[72%] group-hover:opacity-100" />
-            </a>
+            </Link>
             <motion.a
               href="#start"
               whileHover={shouldReduceMotion ? undefined : { y: -2, x: 1, scale: 1.015 }}
@@ -249,7 +248,8 @@ export function HeroSection() {
 
             <h1
               id="top"
-              className="hero-headline scroll-mt-28 font-heading text-5xl font-medium leading-[0.94] tracking-normal text-foreground sm:text-6xl md:text-7xl lg:text-[5.15rem] xl:text-[5.65rem] 2xl:text-[6.1rem]"
+              className="hero-headline scroll-mt-28 font-heading text-5xl font-medium leading-[0.94] tracking-[-0.05em] text-[#0a0a0a] sm:text-6xl md:text-7xl lg:text-[5.15rem] xl:text-[5.65rem] 2xl:text-[6.1rem]"
+              style={{ WebkitFontSmoothing: "antialiased", textRendering: "geometricPrecision" }}
             >
               <span className="block">Discover</span>
               <span className="block">
@@ -265,13 +265,13 @@ export function HeroSection() {
 
             <figure className="mt-7 flex max-w-md gap-5 2xl:mt-8">
               <span className="font-heading text-4xl leading-none text-accent 2xl:text-5xl" aria-hidden="true">
-                “
+                &ldquo;
               </span>
               <blockquote>
                 <p className="text-balance font-heading text-xl leading-snug text-foreground/86 2xl:text-2xl">
                   A different language is a different vision of life.
                 </p>
-                <figcaption className="mt-4 text-sm text-muted-foreground">— Federico Fellini</figcaption>
+                <figcaption className="mt-4 text-sm text-muted-foreground">&mdash; Federico Fellini</figcaption>
               </blockquote>
             </figure>
 
@@ -279,14 +279,15 @@ export function HeroSection() {
               <a
                 id="start"
                 href="#features"
-                className="inline-flex min-h-14 items-center justify-center gap-4 rounded-full bg-foreground px-7 text-sm font-semibold text-background shadow-[0_18px_42px_rgba(17,17,17,0.18)] outline-none transition-[transform,box-shadow,background-color] duration-200 hover:-translate-y-0.5 hover:shadow-[0_24px_54px_rgba(17,17,17,0.22)] focus-visible:ring-2 focus-visible:ring-accent/45 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+                className="inline-flex min-h-14 items-center justify-center gap-4 rounded-full bg-[#050505] px-7 text-sm font-semibold text-background shadow-[0_10px_30px_rgba(0,0,0,0.10)] outline-none transition-[transform,box-shadow,background-color] duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_42px_rgba(0,0,0,0.14)] focus-visible:ring-2 focus-visible:ring-accent/45 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+                style={{ borderRadius: "999px" }}
               >
                 Start Your Journey
                 <ArrowUpRight className="size-4" aria-hidden="true" />
               </a>
               <button
                 type="button"
-                className="inline-flex min-h-14 items-center justify-center gap-4 rounded-full border border-border/70 bg-surface/28 px-7 text-sm font-semibold text-foreground/82 shadow-[0_12px_32px_rgba(17,17,17,0.035)] outline-none backdrop-blur-md transition-[transform,border-color,background-color,color] duration-200 hover:-translate-y-0.5 hover:border-accent/35 hover:bg-surface/55 hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent/45 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+                className="inline-flex min-h-14 items-center justify-center gap-4 rounded-full border border-[rgba(10,10,10,0.08)] bg-[rgba(255,255,255,0.7)] px-7 text-sm font-semibold text-foreground/82 outline-none backdrop-blur-[10px] transition-[transform,border-color,background-color,color] duration-200 hover:-translate-y-0.5 hover:border-accent/35 hover:bg-white/85 hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent/45 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
               >
                 Watch Demo
                 <Play className="size-3.5 fill-current" aria-hidden="true" />
@@ -415,7 +416,7 @@ export function HeroSection() {
                   src={womanPainting}
                   alt="Painting of a woman with a green umbrella in a field"
                   fill
-                  priority
+                  fetchPriority="high"
                   sizes="318px"
                   className="object-cover"
                 />
@@ -496,32 +497,6 @@ export function HeroSection() {
           </div>
         </motion.div>
 
-        <div className="absolute bottom-8 left-1/2 z-30 hidden -translate-x-1/2 flex-col items-center gap-4 xl:flex">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.36em] text-foreground/48">
-            Join thousands of learners worldwide
-          </p>
-          <div className="flex items-center gap-5">
-            <div className="flex -space-x-2">
-              {learners.map((learner, index) => (
-                <span
-                  key={learner}
-                  className="flex size-8 items-center justify-center rounded-full border-2 border-[var(--bg)] bg-foreground text-[9px] font-semibold text-background shadow-[0_8px_22px_rgba(17,17,17,0.12)]"
-                  style={{ opacity: 0.72 + index * 0.04 }}
-                >
-                  {learner}
-                </span>
-              ))}
-            </div>
-            <div className="flex items-center gap-2 text-lg font-medium text-foreground">
-              <span>4.9/5</span>
-              <span className="flex gap-1 text-accent" aria-label="Rated 4.9 out of 5">
-                {Array.from({ length: 5 }, (_, index) => (
-                  <Star key={index} className="size-4 fill-current" aria-hidden="true" />
-                ))}
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
