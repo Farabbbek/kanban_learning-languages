@@ -1,18 +1,14 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { HeroSection } from "@/components/dashboard/hero-section";
-import { MiniStats } from "@/components/dashboard/mini-stats";
 import { KanbanBoard, Column } from "@/components/dashboard/kanban-board";
-import { RightPanel } from "@/components/dashboard/right-panel";
 import { AddTaskModal } from "@/components/dashboard/add-task-modal";
-import {
-  BookOpen,
-  Brain,
-  LineChart,
-} from "lucide-react";
+import { DeleteConfirmModal } from "@/components/dashboard/delete-confirm-modal";
+import { PomodoroTimer } from "@/components/dashboard/pomodoro-timer";
+import { useStudyTracker } from "@/hooks/use-study-tracker";
 
 interface BoardData {
   id: string;
@@ -27,361 +23,272 @@ interface BoardData {
       id: string;
       title: string;
       description?: string;
-      category: string;
-      progress: number;
+      tags: string[];
+      priority: number;
+      estimated_minutes?: number;
       column_id: string;
       position: number;
     }[];
   }[];
 }
 
-interface UserLanguageData {
-  id: string;
-  name: string;
-  flag: string;
-  proficiency: string;
-  streakDays: number;
-}
-
-interface QuizData {
-  id: string;
-  title: string;
-  correctCount: number;
-  totalQuestions: number;
-  completed: boolean;
-  score: number;
-}
-
 interface DashboardClientProps {
   displayName: string;
-  streak: number;
   todayMinutes: number;
   dailyGoal: number;
-  wordsLearned: number;
-  quizzesCompleted: number;
-  dueReviews: number;
   boards: BoardData[];
-  userLanguages: UserLanguageData[];
-  recentQuizzes: QuizData[];
-  vocabByDifficulty: Record<string, number>;
+  initialStreak: number;
+}
+
+function flattenColumns(boards: BoardData[]): Column[] {
+  if (boards.length === 0) return [];
+  return boards[0].columns.map((col) => ({
+    id: col.id,
+    title: col.title,
+    tasks: col.tasks.map((t) => ({
+      id: t.id,
+      title: t.title,
+      description: t.description,
+      tags: t.tags,
+      priority: t.priority,
+      estimated_minutes: t.estimated_minutes,
+      column_id: t.column_id,
+      position: t.position,
+    })),
+  }));
 }
 
 export function DashboardClient({
   displayName,
-  streak,
   todayMinutes,
   dailyGoal,
-  wordsLearned,
-  quizzesCompleted,
-  dueReviews,
   boards,
-  userLanguages,
-  recentQuizzes,
-  vocabByDifficulty,
+  initialStreak,
 }: DashboardClientProps) {
-  const router = useRouter();
+  const freshColumns = useMemo(() => flattenColumns(boards), [boards]);
+  const [columns, setColumns] = useState<Column[]>(freshColumns);
+  const columnsRef = useRef(columns);
 
-  // Flatten first board's columns into Kanban columns
-  const initialColumns: Column[] =
-    boards.length > 0
-      ? boards[0].columns.map((col) => ({
-          id: col.id,
-          title: col.title,
-          tasks: col.tasks.map((t) => ({
-            id: t.id,
-            title: t.title,
-            description: t.description,
-            category: t.category,
-            progress: t.progress,
-            column_id: t.column_id,
-            position: t.position,
-          })),
-        }))
-      : [];
+  useEffect(() => {
+    columnsRef.current = columns;
+  });
 
-  const [columns, setColumns] = useState<Column[]>(initialColumns);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
-  // Sync when boards data changes
-  if (boards.length > 0 && JSON.stringify(initialColumns) !== JSON.stringify(columns)) {
-    setColumns(initialColumns);
-  }
+  // Auto-track study time
+  useStudyTracker();
+
+  // Streak state
+  const [streak, setStreak] = useState(initialStreak);
+
+  // Fetch streak on mount and periodically
+  useEffect(() => {
+    const fetchStreak = async () => {
+      try {
+        const res = await fetch("/api/study/streak");
+        if (res.ok) {
+          const data = await res.json();
+          setStreak(data.streak);
+        }
+      } catch {
+        // silent
+      }
+    };
+    fetchStreak();
+    const interval = setInterval(fetchStreak, 60_000); // refresh every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  // Pomodoro state
+  const [isPomodoroOpen, setIsPomodoroOpen] = useState(false);
 
   const handleMoveTask = useCallback(
-    async (taskId: string, targetColumnId: string, position: number) => {
-      try {
-        const res = await fetch(`/api/tasks/${taskId}/move`, {
+    (taskId: string, targetColumnId: string, position: number) => {
+      setColumns((prev) => {
+        let sourceColIdx = -1;
+        let taskIdx = -1;
+
+        for (let ci = 0; ci < prev.length; ci++) {
+          const ti = prev[ci].tasks.findIndex((t) => t.id === taskId);
+          if (ti !== -1) { sourceColIdx = ci; taskIdx = ti; break; }
+        }
+
+        if (sourceColIdx === -1 || taskIdx === -1) return prev;
+        const destColIdx = prev.findIndex((c) => c.id === targetColumnId);
+        if (destColIdx === -1) return prev;
+
+        const newCols = prev.map((c) => ({ ...c, tasks: [...c.tasks] }));
+        const [movedTask] = newCols[sourceColIdx].tasks.splice(taskIdx, 1);
+        newCols[destColIdx].tasks.splice(position, 0, movedTask);
+
+        fetch(`/api/tasks/${taskId}/move`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ column_id: targetColumnId, position }),
-        });
-        if (!res.ok) throw new Error("Failed to move task");
-        router.refresh();
-      } catch (err) {
-        console.error("Move error:", err);
-      }
-    },
-    [router]
-  );
+        }).catch((err) => console.error("Move API error:", err));
 
-  const handleToggleComplete = useCallback(
-    async (taskId: string) => {
-      try {
-        // Find the task
-        for (const col of columns) {
-          const task = col.tasks.find((t) => t.id === taskId);
-          if (task) {
-            const isDone = col.id.toLowerCase().includes("done") || task.progress >= 100;
-
-            // If done → move back to first column. If not → move to done column.
-            const doneColumn = columns.find((c) => c.id.toLowerCase().includes("done"));
-            const firstColumn = columns[0];
-
-            const targetColId = isDone
-              ? firstColumn?.id ?? col.id
-              : doneColumn?.id ?? col.id;
-            const progress = isDone ? 0 : 100;
-
-            const res = await fetch(`/api/tasks/${taskId}/move`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ column_id: targetColId, position: 0 }),
-            });
-            if (!res.ok) throw new Error("Failed to update task");
-
-            // Also update progress
-            await fetch(`/api/tasks/${taskId}`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ progress }),
-            });
-
-            router.refresh();
-            break;
-          }
-        }
-      } catch (err) {
-        console.error("Toggle error:", err);
-      }
-    },
-    [columns, router]
-  );
-
-  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
-  const [addTaskTargetColumn, setAddTaskTargetColumn] = useState("");
-
-  const handleAddTask = useCallback(
-    (columnId: string) => {
-      setAddTaskTargetColumn(columnId);
-      setIsAddTaskModalOpen(true);
+        return newCols;
+      });
     },
     []
   );
 
+  const handleToggleComplete = useCallback((taskId: string) => {
+    setColumns((prev) => {
+      let sourceColIdx = -1;
+      let taskIdx = -1;
+      for (let ci = 0; ci < prev.length; ci++) {
+        const ti = prev[ci].tasks.findIndex((t) => t.id === taskId);
+        if (ti !== -1) { sourceColIdx = ci; taskIdx = ti; break; }
+      }
+      if (sourceColIdx === -1 || taskIdx === -1) return prev;
+      const isDone = prev[sourceColIdx].title.toLowerCase() === "done";
+      const doneColIdx = prev.findIndex((c) => c.title.toLowerCase() === "done");
+      const targetColIdx = isDone ? 0 : doneColIdx;
+      if (targetColIdx === -1) return prev;
+      const newCols = prev.map((c) => ({ ...c, tasks: [...c.tasks] }));
+      const [moved] = newCols[sourceColIdx].tasks.splice(taskIdx, 1);
+      newCols[targetColIdx].tasks.unshift(moved);
+      const targetColId = newCols[targetColIdx].id;
+      fetch(`/api/tasks/${taskId}/move`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ column_id: targetColId, position: 0 }),
+      }).catch((err) => console.error("Toggle API error:", err));
+      return newCols;
+    });
+  }, []);
+
+  const handleDeleteRequest = useCallback((taskId: string) => {
+    const task = columnsRef.current.flatMap((c) => c.tasks).find((t) => t.id === taskId);
+    if (task) setDeleteTarget({ id: taskId, title: task.title });
+  }, []);
+
+  const handleDeleteConfirm = useCallback(() => {
+    if (!deleteTarget) return;
+    const { id } = deleteTarget;
+    setColumns((prev) => prev.map((col) => ({ ...col, tasks: col.tasks.filter((t) => t.id !== id) })));
+    setDeleteTarget(null);
+    fetch(`/api/tasks/${id}`, { method: "DELETE" }).catch((err) => console.error("Delete API error:", err));
+  }, [deleteTarget]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const colIds = columnsRef.current.map((c) => c.id);
+    if (colIds.length === 0) return;
+    const channel = supabase
+      .channel("tasks-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, async () => {
+        const { data: freshTasks } = await supabase.from("tasks").select("*").in("column_id", colIds).order("position", { ascending: true });
+        if (freshTasks) {
+          setColumns((prev) =>
+            prev.map((col) => ({
+              ...col,
+              tasks: freshTasks.filter((t) => t.column_id === col.id).map((t) => ({
+                id: t.id, title: t.title, description: t.description ?? undefined,
+                tags: t.tags ?? [], priority: t.priority ?? 2,
+                estimated_minutes: t.estimated_minutes ?? undefined,
+                column_id: t.column_id, position: t.position,
+              })),
+            }))
+          );
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const handleAddTaskToColumn = useCallback((_columnId: string) => setIsAddTaskModalOpen(true), []);
+
   return (
     <>
-      <AddTaskModal
-        isOpen={isAddTaskModalOpen}
-        onClose={() => setIsAddTaskModalOpen(false)}
-        targetColumnId={addTaskTargetColumn}
-      />
-      <div className="min-h-screen bg-[#faf7f2] font-sans text-[#1c1917] selection:bg-[#d97757]/20">
-      {/* Sidebar */}
-      <Sidebar displayName={displayName} streak={streak} />
+      <AddTaskModal isOpen={isAddTaskModalOpen} onClose={() => setIsAddTaskModalOpen(false)} targetColumnId={columns[0]?.id ?? ""} />
+      <DeleteConfirmModal isOpen={deleteTarget !== null} onClose={() => setDeleteTarget(null)} onConfirm={handleDeleteConfirm} taskTitle={deleteTarget?.title ?? ""} />
+      <PomodoroTimer isOpen={isPomodoroOpen} onClose={() => setIsPomodoroOpen(false)} />
 
-      {/* Main content area */}
-      <div className="pl-[240px]">
-        <main className="mx-auto max-w-[1400px] px-10 py-10">
-          {/* Hero Section */}
-          <HeroSection
-            displayName={displayName}
-            streak={streak}
-            todayMinutes={todayMinutes}
-            dailyGoal={dailyGoal}
-          />
+      {/* Floating Pomodoro Button — Toggle */}
+      <button
+        onClick={() => setIsPomodoroOpen((prev) => !prev)}
+        className={`group fixed bottom-7 right-7 z-50 flex size-[68px] items-center justify-center rounded-full transition-all duration-[350ms] cubic-bezier(0.16,1,0.3,1) hover:-translate-y-1 hover:scale-[1.04] ${
+          isPomodoroOpen
+            ? "shadow-[0_8px_24px_rgba(40,20,10,0.15)] scale-[0.96] opacity-80"
+            : "shadow-[0_14px_40px_rgba(40,20,10,0.25),0_0_40px_rgba(220,170,110,0.18)] hover:shadow-[0_20px_50px_rgba(40,20,10,0.35),0_0_60px_rgba(220,170,110,0.25)]"
+        }`}
+        style={{
+          background: isPomodoroOpen
+            ? "linear-gradient(145deg, #3a2920 0%, #2d1f18 100%)"
+            : "linear-gradient(145deg, #2d1f18 0%, #3a2920 100%)",
+          border: isPomodoroOpen
+            ? "1px solid rgba(255,255,255,0.04)"
+            : "1px solid rgba(255,255,255,0.08)",
+        }}
+        aria-label={isPomodoroOpen ? "Close Pomodoro Timer" : "Open Pomodoro Timer"}
+      >
+        {/* Inner glow */}
+        <div className={`pointer-events-none absolute inset-0 rounded-full blur-sm transition-opacity duration-300 ${
+          isPomodoroOpen ? "opacity-0" : "opacity-100 bg-[rgba(220,170,110,0.06)]"
+        }`} />
 
-          {/* Today Tasks Kanban */}
-          <div className="mt-8">
-            <KanbanBoard
-              columns={columns}
-              onMoveTask={handleMoveTask}
-              onToggleComplete={handleToggleComplete}
-              onAddTask={handleAddTask}
-            />
-          </div>
+        {/* Icon */}
+        <svg
+          width="26"
+          height="26"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#f1d2a8"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="relative z-10"
+        >
+          <path d="M12 2a10 10 0 1 0 10 10" />
+          <path d="M12 6v6l4 2" />
+          <path d="M20 2v6" />
+          <path d="M17 5h6" />
+        </svg>
+      </button>
 
-          {/* Stats + Languages + Right Panel */}
-          <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_280px]">
-            {/* Left content */}
-            <div className="space-y-8">
-              {/* Mini Stats */}
-              <MiniStats
-                studyMinutes={todayMinutes}
-                streak={streak}
-                wordsLearned={wordsLearned}
-              />
+      <div
+        className="min-h-screen font-sans text-[#2A211C] selection:bg-[#D88A5B]/20"
+        style={{
+          background: "linear-gradient(180deg, #f7f2ea 0%, #f3eee6 100%)",
+        }}
+      >
+        {/* Subtle warm lighting — reduced */}
+        <div className="pointer-events-none fixed -right-32 -top-32 z-0 size-[350px] rounded-full bg-[#D88A5B]/2 blur-[60px]" />
+        <div className="pointer-events-none fixed -left-32 bottom-0 z-0 size-[250px] rounded-full bg-[#D88A5B]/1.5 blur-[50px]" />
 
-              {/* Two columns: Languages + Recent */}
-              <div className="grid gap-6 lg:grid-cols-2">
-                {/* Languages */}
-                <section>
-                  <div className="mb-4 flex items-center justify-between">
-                    <h2 className="font-serif text-xl font-medium text-[#1c1917]">
-                      Your Languages
-                    </h2>
-                    <a
-                      href="/dashboard/languages"
-                      className="text-xs font-semibold text-[#d97757] transition-colors hover:text-[#c56b47]"
-                    >
-                      + Add Language
-                    </a>
-                  </div>
+        {/* Subtle noise texture */}
+        <div
+          className="pointer-events-none fixed inset-0 z-0 opacity-[0.012] mix-blend-multiply"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          }}
+        />
 
-                  {userLanguages.length > 0 ? (
-                    <div className="space-y-4">
-                      {userLanguages.map((ul) => (
-                        <div
-                          key={ul.id}
-                          className="flex items-center gap-4 rounded-2xl border border-[#1c1917]/5 bg-white/60 p-5 shadow-sm backdrop-blur-md transition-all hover:shadow-md hover:-translate-y-0.5"
-                        >
-                          <span className="text-3xl">{ul.flag}</span>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-[#1c1917]">
-                              {ul.name}
-                            </p>
-                            <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-[#8d8175]">
-                              {ul.proficiency.replace("_", " ")}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium text-[#d97757]">
-                              {ul.streakDays}d
-                            </p>
-                            <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-[#8d8175]">
-                              streak
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl border border-dashed border-[#1c1917]/10 bg-white/20 p-8 text-center backdrop-blur-sm">
-                      <BookOpen className="mx-auto mb-3 size-8 text-[#8d8175]/40" />
-                      <p className="text-sm font-medium text-[#1c1917]">
-                        No languages yet
-                      </p>
-                      <p className="mt-1 text-xs text-[#8d8175]">
-                        Add your first language to get started
-                      </p>
-                    </div>
-                  )}
-                </section>
+        <Sidebar
+          displayName={displayName}
+          streak={streak}
+        />
 
-                {/* Recent Quizzes */}
-                <section>
-                  <div className="mb-4 flex items-center justify-between">
-                    <h2 className="font-serif text-xl font-medium text-[#1c1917]">
-                      Recent Quizzes
-                    </h2>
-                    <a
-                      href="/dashboard/quizzes"
-                      className="text-xs font-semibold text-[#d97757] transition-colors hover:text-[#c56b47]"
-                    >
-                      View All
-                    </a>
-                  </div>
+        <div className="relative z-10 pl-[220px]">
+          <main className="mx-auto max-w-[1440px] px-8 py-5">
+            <HeroSection displayName={displayName} todayMinutes={todayMinutes} dailyGoal={dailyGoal} />
 
-                  {recentQuizzes.length > 0 ? (
-                    <div className="space-y-4">
-                      {recentQuizzes.map((q) => (
-                        <div
-                          key={q.id}
-                          className="flex items-center gap-4 rounded-2xl border border-[#1c1917]/5 bg-white/60 p-5 shadow-sm backdrop-blur-md transition-all hover:shadow-md hover:-translate-y-0.5"
-                        >
-                          <div className="flex size-10 items-center justify-center rounded-full bg-[#d97757]/10">
-                            <Brain className="size-5 text-[#d97757]" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-[#1c1917]">
-                              {q.title}
-                            </p>
-                            <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-[#8d8175]">
-                              {q.completed
-                                ? `${q.correctCount}/${q.totalQuestions} correct`
-                                : "In progress"}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p
-                              className={`text-sm font-medium ${
-                                q.totalQuestions > 0 && q.score >= 80
-                                  ? "text-[#4b6a53]"
-                                  : q.totalQuestions > 0 && q.score >= 50
-                                    ? "text-[#d97757]"
-                                    : "text-[#8d8175]"
-                              }`}
-                            >
-                              {q.totalQuestions > 0 ? `${q.score}%` : "—"}
-                            </p>
-                            <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-[#8d8175]">
-                              score
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl border border-dashed border-[#1c1917]/10 bg-white/20 p-8 text-center backdrop-blur-sm">
-                      <LineChart className="mx-auto mb-3 size-8 text-[#8d8175]/40" />
-                      <p className="text-sm font-medium text-[#1c1917]">
-                        No quizzes yet
-                      </p>
-                      <p className="mt-1 text-xs text-[#8d8175]">
-                        Complete your first quiz to see results
-                      </p>
-                    </div>
-                  )}
-                </section>
-              </div>
-
-              {/* Vocabulary Overview */}
-              <section>
-                <h2 className="mb-4 font-serif text-xl font-medium text-[#1c1917]">
-                  Vocabulary Overview
-                </h2>
-                <div className="grid gap-6 sm:grid-cols-3">
-                  {["beginner", "intermediate", "advanced"].map((level) => (
-                    <div
-                      key={level}
-                      className="rounded-2xl border border-[#1c1917]/5 bg-white/60 p-6 shadow-sm backdrop-blur-md transition-all hover:shadow-md hover:-translate-y-0.5"
-                    >
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#8d8175]">
-                        {level}
-                      </p>
-                      <p className="mt-3 font-serif text-3xl font-medium text-[#1c1917]">
-                        {vocabByDifficulty[level] ?? "—"}
-                      </p>
-                      <p className="mt-2 text-xs text-[#8d8175]">
-                        words to review
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </div>
-
-            {/* Right Panel */}
-            <div className="lg:sticky lg:top-10 lg:self-start">
-              <RightPanel
-                dailyGoal={dailyGoal}
-                todayMinutes={todayMinutes}
-                quizzesCompleted={quizzesCompleted}
-                dueReviews={dueReviews}
+            {/* Kanban — full width, dominant */}
+            <div className="mt-4">
+              <KanbanBoard
+                columns={columns}
+                onMoveTask={handleMoveTask}
+                onToggleComplete={handleToggleComplete}
+                onDeleteTask={handleDeleteRequest}
+                onAddTask={handleAddTaskToColumn}
               />
             </div>
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
-    </div>
     </>
   );
 }

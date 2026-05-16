@@ -1,17 +1,15 @@
 "use client";
 
-import { Clock, Sparkles } from "lucide-react";
+import { Sparkles, Clock, ArrowRight } from "lucide-react";
 
 export interface HeroSectionProps {
   displayName: string;
-  streak: number;
   todayMinutes: number;
   dailyGoal: number;
 }
 
 export function HeroSection({
   displayName,
-  streak,
   todayMinutes,
   dailyGoal,
 }: HeroSectionProps) {
@@ -23,104 +21,129 @@ export function HeroSection({
         ? "Good afternoon"
         : "Good evening";
 
+  const progressPercent = Math.min(Math.round((todayMinutes / dailyGoal) * 100), 100);
+
   return (
-    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#faf7f2] via-[#f5eedf] to-[#f0e6d6] p-8 shadow-sm lg:p-10 border border-[#1c1917]/5">
-      {/* Subtle background atmosphere - noise texture and soft gradients */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.03] mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
-      <div className="pointer-events-none absolute -right-20 -top-20 size-96 rounded-full bg-[#d97757]/10 blur-[100px]" />
-      <div className="pointer-events-none absolute -bottom-32 -left-20 size-80 rounded-full bg-[#8d8175]/10 blur-[80px]" />
+    <section
+      className="relative overflow-hidden rounded-2xl"
+      style={{
+        background: "linear-gradient(135deg, #f8f2eb 0%, #f5efe8 45%, #f2ece5 100%)",
+        boxShadow: "0 20px 60px rgba(120,90,60,0.08), 0 6px 20px rgba(120,90,60,0.04), inset 0 1px 0 rgba(255,255,255,0.8)",
+        border: "1px solid rgba(216,138,91,0.08)",
+      }}
+    >
+      {/* Subtle parchment texture */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.025] mix-blend-multiply"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        }}
+      />
 
-      <div className="relative flex items-center justify-between gap-10">
-        {/* Left: Text content */}
-        <div className="max-w-xl">
-          <h1 className="font-serif text-4xl font-medium leading-tight tracking-tight text-[#1c1917] sm:text-5xl">
-            {greeting}, {displayName?.split(" ")[0] ?? "Learner"}.
-          </h1>
-          <p className="mt-4 text-base leading-relaxed text-[#8d8175] font-light">
-            {streak > 0
-              ? `You're on a ${streak}-day streak. Keep your momentum going today.`
-              : "Welcome to your focused learning environment. Let's begin."}
-          </p>
+      {/* Soft warm light beam from right */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(255,245,225,0.08) 40%, rgba(255,235,205,0.20) 70%, transparent 100%)",
+        }}
+      />
 
-          {/* Buttons */}
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <a
-              href="/dashboard/learn"
-              className="inline-flex items-center gap-2.5 rounded-2xl bg-[#1c1917] px-8 py-4 text-sm font-medium text-white shadow-[0_8px_16px_rgba(28,25,23,0.15)] transition-all hover:-translate-y-0.5 hover:bg-[#292524] hover:shadow-[0_12px_24px_rgba(28,25,23,0.25)] active:translate-y-0 active:scale-[0.98]"
-            >
-              <Sparkles className="size-4" strokeWidth={1.8} />
-              Continue Learning
-            </a>
-            <a
-              href="/dashboard/flashcards"
-              className="inline-flex items-center gap-2.5 rounded-2xl border border-[#1c1917]/10 bg-white/70 px-8 py-4 text-sm font-medium text-[#1c1917] shadow-sm backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md hover:border-[#1c1917]/20 active:translate-y-0 active:scale-[0.98]"
-            >
-              <Clock className="size-4" strokeWidth={1.8} />
-              Quick Review
-            </a>
-          </div>
+      {/* Atmospheric glow behind compass */}
+      <div
+        className="pointer-events-none absolute"
+        style={{
+          right: "20px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          width: "380px",
+          height: "380px",
+          background: "radial-gradient(circle, rgba(255,225,185,0.25) 0%, rgba(255,225,185,0.12) 35%, rgba(255,225,185,0.04) 60%, transparent 80%)",
+          filter: "blur(30px)",
+        }}
+      />
 
-          {/* Today's progress mini */}
-          <div className="mt-8 flex items-center gap-6 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8d8175]">
-            <span className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-[#d97757] shadow-[0_0_8px_rgba(217,119,87,0.5)]" />
-              {todayMinutes} min studied
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-[#1c1917]/20" />
-              {dailyGoal} min target
-            </span>
-          </div>
-        </div>
+      {/* REAL compass PNG — clearly visible, not CSS-generated */}
+      <img
+        src="/compas.png"
+        alt=""
+        className="pointer-events-none absolute select-none"
+        style={{
+          right: "36px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          width: "280px",
+          height: "280px",
+          objectFit: "contain",
+          opacity: 0.24,
+          filter: "drop-shadow(0 0 30px rgba(220,190,150,0.18))",
+          animation: "hero-compass-spin 120s linear infinite",
+        }}
+        draggable={false}
+      />
 
-        {/* Right: Atmospheric illustration */}
-        <div className="hidden lg:block pr-8">
-          <div className="relative flex size-56 items-center justify-center">
-            {/* Elegant minimal architectural/compass shapes */}
-            <div className="absolute size-48 rounded-full border-[0.5px] border-[#1c1917]/10" />
-            <div
-              className="absolute size-40 rounded-full border-[0.5px] border-dashed border-[#1c1917]/20"
-              style={{ transform: "rotate(15deg)" }}
-            />
-            <div
-              className="absolute h-64 w-[0.5px] bg-gradient-to-b from-transparent via-[#1c1917]/10 to-transparent"
-              style={{ transform: "rotate(45deg)" }}
-            />
-            <div
-              className="absolute h-64 w-[0.5px] bg-gradient-to-b from-transparent via-[#1c1917]/10 to-transparent"
-              style={{ transform: "rotate(-45deg)" }}
-            />
+      {/* Content */}
+      <div className="relative px-7 py-6">
+        <div className="flex items-center justify-between">
+          {/* Left: Greeting */}
+          <div>
+            <h1 className="font-serif text-[24px] font-medium tracking-tight text-[#1F1610] sm:text-[28px] leading-[1.1]">
+              {greeting}, {displayName?.split(" ")[0] ?? "Learner"}.
+            </h1>
+            <p className="mt-1.5 text-sm font-medium leading-relaxed" style={{ color: "rgba(100,80,65,0.65)" }}>
+              What are you learning today?
+            </p>
 
-            {/* Center subtle icon wrapper */}
-            <div className="absolute flex size-24 items-center justify-center rounded-3xl bg-white/40 shadow-sm backdrop-blur-xl border border-white/60" style={{ transform: "rotate(10deg)" }}>
-              <Sparkles className="size-10 text-[#1c1917]/70" strokeWidth={1} style={{ transform: "rotate(-10deg)" }} />
+            {/* Action buttons */}
+            <div className="mt-4 flex items-center gap-3">
+              <a
+                href="/dashboard/learn"
+                className="tactile-button inline-flex items-center gap-2 rounded-xl bg-[#2A211C] px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_12px_rgba(42,33,28,0.2)] hover:bg-[#3D322B] hover:shadow-[0_6px_16px_rgba(42,33,28,0.25)]"
+              >
+                <Sparkles className="size-3.5" strokeWidth={1.8} />
+                Continue Learning
+                <ArrowRight className="size-3" strokeWidth={2} />
+              </a>
+              <a
+                href="/dashboard/flashcards"
+                className="tactile-button inline-flex items-center gap-2 rounded-xl border border-[#D88A5B]/15 bg-white/70 px-4 py-2 text-xs font-semibold text-[#2A211C] shadow-sm backdrop-blur-md hover:bg-white/90 hover:shadow-md"
+              >
+                <Clock className="size-3.5" strokeWidth={1.8} />
+                Quick Review
+              </a>
             </div>
+          </div>
 
-            {/* Micro details */}
-            <div className="absolute -top-4 right-10 size-1 rounded-full bg-[#1c1917]/30" />
-            <div className="absolute bottom-4 left-10 size-1.5 rounded-full bg-[#d97757]/40" />
+          {/* Right: Daily goal — frosted glass container */}
+          <div
+            className="flex items-center gap-3 rounded-xl px-4 py-2.5"
+            style={{
+              background: "rgba(255,255,255,0.35)",
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.45)",
+            }}
+          >
+            <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8d8175]">
+              <span className="size-2 rounded-full bg-[#D88A5B]" />
+              {todayMinutes}m / {dailyGoal}m
+            </span>
+            <div className="h-1.5 w-20 overflow-hidden rounded-full bg-[#2A211C]/8">
+              <div
+                className="h-full rounded-full bg-[#2A211C] transition-all duration-700 ease-out"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </section>
-  );
-}
 
-function BookOpen(props: { className?: string; strokeWidth?: number }) {
-  return (
-    <svg
-      className={props.className}
-      width="40"
-      height="40"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={props.strokeWidth ?? 1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-    </svg>
+      {/* Keyframes for compass rotation */}
+      <style>{`
+        @keyframes hero-compass-spin {
+          from { transform: translateY(-50%) rotate(0deg); }
+          to { transform: translateY(-50%) rotate(360deg); }
+        }
+      `}</style>
+    </section>
   );
 }

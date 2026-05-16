@@ -30,6 +30,13 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
+  // Root path — always redirect to login
+  if (pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
   // Protected routes — redirect to login if not authenticated
   if (pathname.startsWith("/dashboard") && !user) {
     const url = request.nextUrl.clone();
