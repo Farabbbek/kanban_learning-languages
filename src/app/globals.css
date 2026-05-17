@@ -63,6 +63,37 @@
     .ml-\[220px\] {
       margin-left: 0;
     }
+
+    .cinematic-page {
+      background: linear-gradient(180deg, var(--bg) 0%, #f4eee5 100%);
+    }
+
+    .cinematic-page::before,
+    .cinematic-hero::after,
+    .cinematic-hero-glow,
+    .cinematic-next-section::before,
+    .workspace-fog {
+      display: none;
+    }
+
+    .mobile-flat-glass {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      box-shadow: 0 12px 34px rgba(42, 33, 28, 0.08) !important;
+    }
+
+    .mobile-quiet-motion,
+    .mobile-quiet-motion * {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 120ms !important;
+    }
+
+    .dashboard-mobile-nav {
+      background-image: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
   }
   html {
     @apply font-sans;
@@ -83,6 +114,14 @@
   
   .glass-panel {
     @apply bg-surface backdrop-blur-xl border border-border/50 shadow-premium;
+  }
+
+  .scrollbar-hide {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
   
   .cinematic-glow {

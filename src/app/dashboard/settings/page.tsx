@@ -191,7 +191,7 @@ function ProfileInput({
   const [focused, setFocused] = useState(false);
 
   const inputClasses = cn(
-    "w-full rounded-xl bg-white/80 px-4 py-[11px] text-sm font-medium text-[#1A110C] placeholder:text-[#B0A092]/60 transition-all duration-150 outline-none",
+    "w-full rounded-xl bg-white/80 px-4 py-3 text-[16px] font-medium text-[#1A110C] placeholder:text-[#B0A092]/60 transition-all duration-150 outline-none md:py-[11px] md:text-sm",
     "border",
     focused
       ? "border-[#D4BFAE]/60 ring-[2.5px] ring-[#D4BFAE]/15"
@@ -377,22 +377,22 @@ export default function SettingsPage() {
       />
 
       <div>
-        <div className="mx-auto max-w-xl px-8 pt-12 pb-24">
+        <div className="mx-auto max-w-xl px-3 pb-24 pt-4 sm:px-5 md:px-8 md:pt-12">
           {/* ── HERO ── */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-10"
+            className="mb-7 md:mb-10"
           >
             <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-[#EBE3DA]/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#8B7B6B]/70">
               <Sparkles className="size-2.5" strokeWidth={1.5} />
               Profile
             </div>
-            <h1 className="text-[22px] font-semibold tracking-tight text-[#1A110C]">
+            <h1 className="font-serif text-[32px] font-semibold leading-tight tracking-tight text-[#1A110C] md:text-[22px] md:font-semibold">
               Settings
             </h1>
-            <p className="mt-1 text-sm text-[#8B7B6B]">
+            <p className="mt-1 text-[15px] text-[#8B7B6B] md:text-sm">
               Manage your LinguaBoard profile.
             </p>
           </motion.div>
@@ -402,7 +402,7 @@ export default function SettingsPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-2xl border border-[#E8DDD2] bg-white px-8 py-8 shadow-sm"
+            className="mobile-flat-glass rounded-[22px] border border-[#E8DDD2] bg-white px-4 py-6 shadow-sm sm:px-6 md:rounded-2xl md:px-8 md:py-8"
           >
             <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:gap-10">
               {/* Avatar */}
@@ -453,10 +453,10 @@ export default function SettingsPage() {
             <div className="my-6 border-t border-[#F0EBE5]" />
 
             {/* Actions */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
               <button
                 onClick={handleSignOut}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#8B7B6B]/60 transition-colors duration-150 hover:text-[#C75A42]"
+                className="inline-flex items-center justify-center gap-1.5 text-xs font-medium text-[#8B7B6B]/60 transition-colors duration-150 hover:text-[#C75A42] sm:justify-start"
               >
                 <LogOut className="size-3.5" strokeWidth={1.5} />
                 Sign Out
@@ -467,7 +467,7 @@ export default function SettingsPage() {
                 disabled={isSaving}
                 whileHover={!isSaving ? { scale: 1.02 } : {}}
                 whileTap={!isSaving ? { scale: 0.98 } : {}}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#1A110C] px-6 py-[11px] text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-[#2D211A] active:scale-[0.98] disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#1A110C] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-[#2D211A] active:scale-[0.98] disabled:opacity-60 sm:w-auto sm:py-[11px]"
               >
                 {isSaving ? (
                   <Loader2 className="size-4 animate-spin" strokeWidth={1.5} />

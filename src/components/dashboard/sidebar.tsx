@@ -48,7 +48,7 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
 
   return (
     <aside
-      className="fixed inset-x-3 bottom-3 z-40 flex h-[76px] flex-col overflow-hidden rounded-[22px] border border-[rgba(210,190,170,0.34)] shadow-[0_18px_54px_rgba(42,33,28,0.18),inset_0_1px_0_rgba(255,255,255,0.55)] md:inset-x-auto md:bottom-auto md:left-0 md:top-0 md:h-screen md:w-[220px] md:rounded-none md:border-r md:border-[rgba(210,190,170,0.22)] md:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_0_60px_rgba(210,180,140,0.12)]"
+      className="dashboard-mobile-nav fixed inset-x-3 bottom-3 z-40 flex h-[76px] flex-col overflow-hidden rounded-[22px] border border-[rgba(210,190,170,0.34)] shadow-[0_18px_54px_rgba(42,33,28,0.18),inset_0_1px_0_rgba(255,255,255,0.55)] md:inset-x-auto md:bottom-auto md:left-0 md:top-0 md:h-screen md:w-[220px] md:rounded-none md:border-r md:border-[rgba(210,190,170,0.22)] md:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_0_60px_rgba(210,180,140,0.12)]"
       style={{
         backgroundColor: "rgba(250,246,240,0.92)",
         backdropFilter: "blur(12px)",
@@ -93,7 +93,7 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
         </div>
 
         {/* ========== NAVIGATION ========== */}
-        <nav className="flex-1 overflow-x-auto px-2 py-2 md:overflow-visible md:px-3 md:py-1">
+        <nav className="scrollbar-hide flex-1 overflow-x-auto overscroll-x-contain px-2 py-2 md:overflow-visible md:px-3 md:py-1">
           <div className="mb-3 hidden px-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#8d8175]/50 md:block">
             Menu
           </div>
@@ -108,7 +108,7 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "group relative flex min-w-[64px] flex-col items-center justify-center gap-1 rounded-2xl px-2.5 py-2 text-[10px] font-semibold transition-all duration-200 ease-out md:min-w-0 md:flex-row md:justify-start md:gap-3 md:rounded-xl md:px-3 md:py-2.5 md:text-[13px] md:font-medium",
+                    "group relative flex min-w-[60px] flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[10px] font-semibold transition-all duration-200 ease-out md:min-w-0 md:flex-row md:justify-start md:gap-3 md:rounded-xl md:px-3 md:py-2.5 md:text-[13px] md:font-medium",
                     isActive
                       ? "bg-[rgba(255,250,245,0.95)] text-[#1F1610] shadow-[0_8px_24px_rgba(180,140,100,0.10)] border border-[#D88A5B]/10"
                       : "text-[#6B5D52] hover:translate-x-[2px] hover:bg-[rgba(255,250,245,0.5)] hover:text-[#1F1610]"

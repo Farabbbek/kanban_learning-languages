@@ -15,12 +15,12 @@ import {
   Archive,
   X,
   BookOpen,
-  Sparkles,
   Compass,
   FileUp,
   Trash2,
   Play,
-  File,
+  Download,
+  AlertTriangle,
 } from "lucide-react";
 import { LuxurySelect } from "@/components/ui/luxury-select";
 import { createClient } from "@/lib/supabase/client";
@@ -139,8 +139,44 @@ function storagePathFromPublicUrl(url: string): string | null {
   return decodeURIComponent(url.slice(index + marker.length));
 }
 
-function getFileExtension(filename: string): string {
-  return filename.split(".").pop()?.toLowerCase() ?? "";
+function normalizeExternalUrl(url: string): string | null {
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
+function getMaterialFileUrl(material: LearningMaterial): string | null {
+  return material.file_path || null;
+}
+
+function getMaterialFileName(material: LearningMaterial): string {
+  const source = material.file_path || material.url || material.title;
+  const filename = fileNameFromPath(source.split("?")[0]);
+  return filename.includes(".") ? filename : `${material.title || "learning-material"}.pdf`;
+}
+
+function openInNewTab(url: string | null) {
+  if (!url) return;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+async function downloadFile(url: string, filename: string) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Download failed");
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(objectUrl);
+  } catch {
+    openInNewTab(url);
+  }
 }
 
 /* ──────────────────────────────────────────────
@@ -561,6 +597,9 @@ function MaterialCard({
   const hasOtherUrl = material.url && !hasYoutubeUrl && material.category !== "youtube";
   const isPdfCategory = material.category === "pdf";
   const badge = CATEGORY_BADGE[material.category] || CATEGORY_BADGE.other;
+  const normalizedUrl = material.url ? normalizeExternalUrl(material.url) : null;
+  const fileUrl = getMaterialFileUrl(material);
+  const fileName = getMaterialFileName(material);
 
   const showYoutubePreview = hasYoutubeUrl || material.category === "youtube";
   const showPdfPreview = (hasFile && isPdfCategory) || isPdfCategory;
@@ -578,8 +617,28 @@ function MaterialCard({
   const [ytThumbError, setYtThumbError] = useState(false);
 
   const youtubeId = showYoutubePreview && material.url ? getYoutubeId(material.url) : null;
-  const youtubeThumbSrc = youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : null;
+  const youtubeThumbSrc = youtubeId ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg` : null;
   const canDelete = currentUserId === material.user_id;
+  const primaryUrl = hasYoutubeUrl || hasOtherUrl || material.category === "youtube" ? normalizedUrl : fileUrl;
+
+  const handleOpenPrimary = useCallback(() => {
+    openInNewTab(primaryUrl);
+  }, [primaryUrl]);
+
+  const handleOpenUrl = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    openInNewTab(normalizedUrl);
+  }, [normalizedUrl]);
+
+  const handleOpenFile = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    openInNewTab(fileUrl);
+  }, [fileUrl]);
+
+  const handleDownloadFile = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (fileUrl) void downloadFile(fileUrl, fileName);
+  }, [fileName, fileUrl]);
 
   return (
     <motion.div
@@ -588,7 +647,16 @@ function MaterialCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -12, scale: 0.96 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative overflow-hidden rounded-[24px] border border-[rgba(210,190,170,0.14)] transition-all duration-[400ms] ease-out hover:-translate-y-[4px] hover:shadow-[0_32px_80px_rgba(42,33,28,0.13),0_0_0_1px_rgba(216,138,91,0.15)_inset] cursor-pointer"
+      onClick={handleOpenPrimary}
+      role={primaryUrl ? "button" : undefined}
+      tabIndex={primaryUrl ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (primaryUrl && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          handleOpenPrimary();
+        }
+      }}
+      className="group relative overflow-hidden rounded-[24px] border border-[rgba(210,190,170,0.14)] transition-all duration-[400ms] ease-out hover:-translate-y-[4px] hover:shadow-[0_32px_80px_rgba(42,33,28,0.13),0_0_0_1px_rgba(216,138,91,0.15)_inset] cursor-pointer focus:outline-none focus:ring-4 focus:ring-[#D88A5B]/12"
       style={{
         background: "linear-gradient(165deg, rgba(255,255,255,0.6), rgba(250,246,240,0.4), rgba(243,238,230,0.2))",
         boxShadow: "0 12px 36px rgba(42,33,28,0.04), 0 0 0 1px rgba(255,255,255,0.5) inset, 0 -1px 0 rgba(255,255,255,0.7) inset",
@@ -609,13 +677,7 @@ function MaterialCard({
                 alt=""
                 className={`h-full w-full object-cover transition-opacity duration-500 ${ytThumbLoaded ? "opacity-100" : "opacity-0 absolute"}`}
                 onLoad={() => setYtThumbLoaded(true)}
-                onError={() => {
-                  const fallback = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
-                  const img = new window.Image();
-                  img.src = fallback;
-                  img.onload = () => { setYtThumbLoaded(true); setYtThumbError(false); };
-                  img.onerror = () => setYtThumbError(true);
-                }}
+                onError={() => setYtThumbError(true)}
               />
             )}
             {(ytThumbError || !youtubeThumbSrc) && (
@@ -623,11 +685,14 @@ function MaterialCard({
             )}
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(42,33,28,0.35)] via-transparent to-[rgba(42,33,28,0.05)]" />
             {hasFile && (
-              <div className="absolute bottom-[16px] right-[16px] z-20 flex h-[28px] items-center gap-[7px] rounded-full px-3.5 text-[11px] font-semibold uppercase tracking-[0.08em] backdrop-blur-[12px] shadow-[0_10px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)] transition-all duration-200 group-hover:translate-y-[-1px]"
+              <button
+                type="button"
+                onClick={handleOpenFile}
+                className="absolute bottom-[16px] right-[16px] z-20 flex h-[28px] items-center gap-[7px] rounded-full px-3.5 text-[11px] font-semibold uppercase tracking-[0.08em] backdrop-blur-[12px] shadow-[0_10px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)] transition-all duration-200 hover:scale-105 group-hover:translate-y-[-1px]"
                 style={{ backgroundColor: "rgba(40,32,28,0.82)", color: "#f0dcc8", border: "1px solid rgba(255,255,255,0.08)" }}
               >
                 <FileText className="size-[13px] text-[#f0dcc8]/70" strokeWidth={1.7} /> PDF
-              </div>
+              </button>
             )}
           </div>
         )}
@@ -655,19 +720,26 @@ function MaterialCard({
           </div>
         )}
 
-        {showYoutubePreview && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+        {showYoutubePreview && normalizedUrl && (
+          <button type="button" onClick={handleOpenUrl} className="absolute inset-0 z-10 flex items-center justify-center" aria-label="Open YouTube video">
             <div className="flex size-16 items-center justify-center rounded-full bg-[rgba(42,33,28,0.75)] shadow-[0_8px_30px_rgba(0,0,0,0.2)] backdrop-blur-[2px] transition-all duration-300 group-hover:scale-110">
               <Play className="ml-1 size-7 text-white" fill="white" strokeWidth={0} />
             </div>
-          </div>
+          </button>
         )}
 
         {canDelete && (
-          <button onClick={() => onDelete(material)} title="Delete material"
-            className="absolute right-3 top-3 z-20 flex size-8 items-center justify-center rounded-full bg-[rgba(255,255,255,0.7)] opacity-0 backdrop-blur-sm transition-all duration-200 group-hover:opacity-100 hover:bg-[rgba(180,90,60,0.15)] hover:text-[#d07a52] text-[#8d8175]/50 shadow-sm"
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(material);
+            }}
+            title="Delete material"
+            className="absolute right-3 top-3 z-30 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-2 text-[11px] font-semibold text-[#b75542] shadow-[0_10px_26px_rgba(42,33,28,0.14)] ring-1 ring-[#b75542]/12 backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#fff7f4] hover:ring-[#b75542]/24"
           >
             <Trash2 className="size-3.5" strokeWidth={1.5} />
+            Delete
           </button>
         )}
 
@@ -675,7 +747,10 @@ function MaterialCard({
 
         <div className="absolute left-[18px] top-[18px] z-20 flex flex-col gap-[10px]">
           {resourceBadges.length > 1 && resourceBadges.slice(1).map((rb) => (
-            <div key={rb}
+            <button
+              type="button"
+              key={rb}
+              onClick={rb === "YOUTUBE" ? handleOpenUrl : handleOpenFile}
               className="flex h-[30px] items-center gap-[6px] rounded-full px-3.5 text-[11px] font-bold uppercase tracking-[0.16em] backdrop-blur-[10px] shadow-[0_8px_24px_rgba(0,0,0,0.22)] transition-all duration-200"
               style={{
                 backgroundColor: "rgba(22,18,16,0.88)", color: "#f2d5b7",
@@ -684,25 +759,31 @@ function MaterialCard({
             >
               {rb === "YOUTUBE" ? <Play className="size-[15px] opacity-90" fill="none" strokeWidth={1.8} /> : <FileText className="size-[15px] opacity-80" strokeWidth={1.6} />}
               {rb}
-            </div>
+            </button>
           ))}
-          <div className="flex h-[30px] items-center gap-[6px] rounded-full px-3.5 text-[11px] font-bold uppercase tracking-[0.16em] backdrop-blur-[10px] shadow-[0_8px_24px_rgba(0,0,0,0.22)] transition-all duration-200"
+          <button
+            type="button"
+            onClick={hasYoutubeUrl ? handleOpenUrl : hasFile ? handleOpenFile : handleOpenPrimary}
+            className="flex h-[30px] items-center gap-[6px] rounded-full px-3.5 text-[11px] font-bold uppercase tracking-[0.16em] backdrop-blur-[10px] shadow-[0_8px_24px_rgba(0,0,0,0.22)] transition-all duration-200 hover:scale-105"
             style={{
               backgroundColor: "rgba(22,18,16,0.88)", color: "#f2d5b7",
               border: "1px solid rgba(242,213,183,0.20)",
             }}
           >
             {badge.label}
-          </div>
+          </button>
         </div>
 
-        {domain && (
-          <div className="absolute bottom-[16px] left-[16px] z-20 flex h-[26px] items-center gap-[6px] rounded-full px-3 text-[10px] font-semibold uppercase tracking-[0.08em] backdrop-blur-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.06)]"
+        {domain && normalizedUrl && (
+          <button
+            type="button"
+            onClick={handleOpenUrl}
+            className="absolute bottom-[16px] left-[16px] z-20 flex h-[26px] items-center gap-[6px] rounded-full px-3 text-[10px] font-semibold uppercase tracking-[0.08em] backdrop-blur-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.06)] transition-transform hover:scale-105"
             style={{ backgroundColor: "rgba(18,14,12,0.72)", color: "rgba(255,245,235,0.80)", border: "1px solid rgba(255,255,255,0.08)" }}
           >
             {hasYoutubeUrl ? <Play className="size-[11px] text-[#f2d4bc]/70" fill="none" strokeWidth={2} /> : <Globe className="size-[11px] text-[rgba(255,245,235,0.60)]" strokeWidth={1.8} />}
             <span className="truncate max-w-[120px]">{domain}</span>
-          </div>
+          </button>
         )}
       </div>
 
@@ -721,7 +802,12 @@ function MaterialCard({
         {material.tags.length > 0 && (
           <div className="mb-3 flex flex-wrap gap-1.5">
             {material.tags.map((tag) => (
-              <button key={tag} onClick={() => onTagClick(`#${tag}`)}
+              <button
+                key={tag}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTagClick(`#${tag}`);
+                }}
                 className="rounded-full bg-[rgba(210,190,170,0.1)] px-3 py-1 text-[11px] font-medium text-[#8d8175] transition-all duration-200 hover:bg-[#D88A5B]/10 hover:text-[#D88A5B]"
               >
                 #{tag}
@@ -730,7 +816,7 @@ function MaterialCard({
           </div>
         )}
 
-        <div className="flex items-center justify-between border-t border-[rgba(210,190,170,0.1)] pt-3 mt-2">
+        <div className="mt-2 flex items-center justify-between border-t border-[rgba(210,190,170,0.1)] pt-3">
           <div className="flex items-center gap-2 min-w-0">
             {material.profiles ? (
               <>
@@ -753,6 +839,41 @@ function MaterialCard({
           </div>
           <span className="shrink-0 text-[10px] text-[#8d8175]/40">{formattedDate}</span>
         </div>
+
+        {(normalizedUrl || fileUrl) && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {normalizedUrl && (
+              <button
+                type="button"
+                onClick={handleOpenUrl}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#D88A5B]/14 bg-[#D88A5B]/10 px-3 py-1.5 text-[11px] font-semibold text-[#8a5a3b] transition-colors hover:border-[#D88A5B]/28 hover:bg-[#D88A5B]/15"
+              >
+                {hasYoutubeUrl ? <Play className="size-3" strokeWidth={1.8} /> : <ExternalLink className="size-3" strokeWidth={1.8} />}
+                Open
+              </button>
+            )}
+            {fileUrl && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleOpenFile}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#2A211C]/10 bg-white/55 px-3 py-1.5 text-[11px] font-semibold text-[#5a463d] transition-colors hover:bg-white"
+                >
+                  <FileText className="size-3" strokeWidth={1.8} />
+                  View PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadFile}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#2A211C]/10 bg-white/55 px-3 py-1.5 text-[11px] font-semibold text-[#5a463d] transition-colors hover:bg-white"
+                >
+                  <Download className="size-3" strokeWidth={1.8} />
+                  Download
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </motion.div>
   );
@@ -1072,18 +1193,23 @@ export default function LearnPage() {
                 style={{ background: "linear-gradient(160deg, rgba(250,246,240,0.97), rgba(243,238,230,0.98))", backdropFilter: "blur(24px)" }}
               >
                 <div className="relative z-10 p-7 text-center">
-                  <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-[rgba(180,90,60,0.06)]">
-                    <Archive className="size-6 text-[#d07a52]" strokeWidth={1.3} />
+                  <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-[#b75542]/10 ring-1 ring-[#b75542]/15">
+                    <AlertTriangle className="size-6 text-[#b75542]" strokeWidth={1.6} />
                   </div>
-                  <h2 className="font-serif text-xl font-semibold tracking-tight text-[#2A211C]">Delete this material?</h2>
-                  <p className="mt-1 text-sm text-[#8d8175]">This action cannot be undone.</p>
+                  <h2 className="font-serif text-xl font-semibold tracking-tight text-[#2A211C]">Are you sure you want to delete this?</h2>
+                  <p className="mx-auto mt-2 max-w-[300px] text-sm leading-relaxed text-[#8d8175]">
+                    <span className="font-medium text-[#2A211C]">{deleteTarget.title}</span> will be removed from the community library. This action cannot be undone.
+                  </p>
                   <div className="mt-6 flex items-center justify-center gap-3">
                     <button onClick={() => setDeleteTarget(null)}
-                      className="rounded-[14px] px-5 py-2.5 text-sm font-medium text-[#8d8175] transition-colors hover:text-[#2A211C]"
+                      className="rounded-[14px] border border-[rgba(210,190,170,0.22)] bg-white/55 px-5 py-2.5 text-sm font-medium text-[#6B5D52] transition-colors hover:bg-white hover:text-[#2A211C]"
                     >Cancel</button>
                     <button onClick={() => handleDeleteMaterial(deleteTarget)}
-                      className="rounded-[14px] bg-[#2b1d18] px-6 py-2.5 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:bg-[#3d2b24]"
-                    >Delete</button>
+                      className="inline-flex items-center gap-2 rounded-[14px] bg-[#b75542] px-6 py-2.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(183,85,66,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#a54838]"
+                    >
+                      <Trash2 className="size-4" strokeWidth={1.8} />
+                      Delete
+                    </button>
                   </div>
                 </div>
               </div>

@@ -118,7 +118,7 @@ function FloatingDust() {
   );
 
   return (
-    <div className="pointer-events-none fixed inset-0 ml-[220px] overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 ml-[220px] hidden overflow-hidden md:block">
       {dust.map((d) => (
         <motion.div
           key={d.id}
@@ -370,13 +370,13 @@ function HeroSection({ onModeSelect }: { onModeSelect: (mode: ViewMode) => void 
 
 function ModeSelector({ activeMode, onSelect }: { activeMode: ViewMode; onSelect: (mode: ViewMode) => void }) {
   return (
-    <div className="mb-10 grid grid-cols-2 gap-4">
+    <div className="mb-8 grid grid-cols-2 gap-3 md:mb-10 md:gap-4">
       <motion.button
         onClick={() => onSelect("flashcards")}
         whileHover={{ y: -4, scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className={cn(
-          "relative overflow-hidden rounded-[24px] border-2 p-7 text-left transition-all duration-300",
+          "mobile-flat-glass relative overflow-hidden rounded-[22px] border-2 p-4 text-left transition-all duration-300 sm:p-5 md:rounded-[24px] md:p-7",
           activeMode === "flashcards"
             ? "border-[#D88A5B]/40 bg-[#D88A5B]/8 shadow-[0_12px_40px_rgba(216,138,91,0.12)]"
             : "border-[rgba(210,190,170,0.20)] bg-white/60 hover:border-[#D88A5B]/25 hover:bg-white/80 hover:shadow-[0_8px_24px_rgba(42,33,28,0.06)]"
@@ -384,14 +384,14 @@ function ModeSelector({ activeMode, onSelect }: { activeMode: ViewMode; onSelect
         style={activeMode === "flashcards" ? { background: "linear-gradient(135deg, rgba(216,138,91,0.10), rgba(201,169,110,0.05))" } : {}}
       >
         {activeMode === "flashcards" && (
-          <motion.div layoutId="modeBg" className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full bg-[#D88A5B]/10 blur-3xl" />
+          <motion.div layoutId="modeBg" className="pointer-events-none absolute -right-8 -top-8 hidden size-40 rounded-full bg-[#D88A5B]/10 blur-3xl md:block" />
         )}
         <div className="relative z-10">
-          <div className={cn("mb-4 flex size-14 items-center justify-center rounded-[16px] transition-all", activeMode === "flashcards" ? "bg-[#2A211C] shadow-lg" : "bg-[rgba(232,218,200,0.3)]")}>
-            <Layers className={cn("size-6", activeMode === "flashcards" ? "text-white" : "text-[#D88A5B]")} strokeWidth={1.5} />
+          <div className={cn("mb-4 flex size-12 items-center justify-center rounded-[16px] transition-all md:size-14", activeMode === "flashcards" ? "bg-[#2A211C] shadow-lg" : "bg-[rgba(232,218,200,0.3)]")}>
+            <Layers className={cn("size-5 md:size-6", activeMode === "flashcards" ? "text-white" : "text-[#D88A5B]")} strokeWidth={1.5} />
           </div>
-          <h3 className="font-serif text-[22px] font-semibold text-[#1F1610]">Flashcards</h3>
-          <p className="mt-1.5 text-[13px] text-[#6f6257]/70 leading-relaxed">Generate AI flashcards with flip animation, swipe gestures, and pronunciation.</p>
+          <h3 className="font-serif text-[22px] font-semibold leading-tight text-[#1F1610] md:text-[22px]">Flashcards</h3>
+          <p className="mt-2 text-[13px] leading-relaxed text-[#6f6257]/70 md:mt-1.5">Generate AI flashcards with swipe gestures and pronunciation.</p>
         </div>
       </motion.button>
 
@@ -400,7 +400,7 @@ function ModeSelector({ activeMode, onSelect }: { activeMode: ViewMode; onSelect
         whileHover={{ y: -4, scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className={cn(
-          "relative overflow-hidden rounded-[24px] border-2 p-7 text-left transition-all duration-300",
+          "mobile-flat-glass relative overflow-hidden rounded-[22px] border-2 p-4 text-left transition-all duration-300 sm:p-5 md:rounded-[24px] md:p-7",
           activeMode === "quiz"
             ? "border-[#D88A5B]/40 bg-[#D88A5B]/8 shadow-[0_12px_40px_rgba(216,138,91,0.12)]"
             : "border-[rgba(210,190,170,0.20)] bg-white/60 hover:border-[#D88A5B]/25 hover:bg-white/80 hover:shadow-[0_8px_24px_rgba(42,33,28,0.06)]"
@@ -408,14 +408,14 @@ function ModeSelector({ activeMode, onSelect }: { activeMode: ViewMode; onSelect
         style={activeMode === "quiz" ? { background: "linear-gradient(135deg, rgba(216,138,91,0.10), rgba(201,169,110,0.05))" } : {}}
       >
         {activeMode === "quiz" && (
-          <motion.div layoutId="modeBg" className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full bg-[#D88A5B]/10 blur-3xl" />
+          <motion.div layoutId="modeBg" className="pointer-events-none absolute -right-8 -top-8 hidden size-40 rounded-full bg-[#D88A5B]/10 blur-3xl md:block" />
         )}
         <div className="relative z-10">
-          <div className={cn("mb-4 flex size-14 items-center justify-center rounded-[16px] transition-all", activeMode === "quiz" ? "bg-[#2A211C] shadow-lg" : "bg-[rgba(232,218,200,0.3)]")}>
-            <Sword className={cn("size-6", activeMode === "quiz" ? "text-white" : "text-[#D88A5B]")} strokeWidth={1.5} />
+          <div className={cn("mb-4 flex size-12 items-center justify-center rounded-[16px] transition-all md:size-14", activeMode === "quiz" ? "bg-[#2A211C] shadow-lg" : "bg-[rgba(232,218,200,0.3)]")}>
+            <Sword className={cn("size-5 md:size-6", activeMode === "quiz" ? "text-white" : "text-[#D88A5B]")} strokeWidth={1.5} />
           </div>
-          <h3 className="font-serif text-[22px] font-semibold text-[#1F1610]">Quiz</h3>
-          <p className="mt-1.5 text-[13px] text-[#6f6257]/70 leading-relaxed">Test your knowledge with AI-generated quizzes. Multiple question types available.</p>
+          <h3 className="font-serif text-[22px] font-semibold leading-tight text-[#1F1610] md:text-[22px]">Quiz</h3>
+          <p className="mt-2 text-[13px] leading-relaxed text-[#6f6257]/70 md:mt-1.5">Test your knowledge with AI-generated quizzes.</p>
         </div>
       </motion.button>
     </div>
@@ -495,23 +495,23 @@ function FlashcardForm({ onGenerate, isGenerating }: { onGenerate: (params: { la
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-[32px] border border-[rgba(210,190,170,0.18)] p-7 md:p-8"
+      className="mobile-flat-glass relative overflow-hidden rounded-[24px] border border-[rgba(210,190,170,0.18)] p-4 sm:p-5 md:rounded-[32px] md:p-8"
       style={{
         background: "linear-gradient(165deg, rgba(255,250,245,0.96), rgba(250,244,235,0.92))",
         boxShadow: "0 28px 88px rgba(42,33,28,0.10), 0 0 0 1px rgba(255,255,255,0.4) inset",
       }}
     >
-      <div className="pointer-events-none absolute -top-8 right-1/4 size-40 rounded-full bg-[#D88A5B]/12 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-10 left-1/5 size-32 rounded-full bg-[#C9A96E]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-8 right-1/4 hidden size-40 rounded-full bg-[#D88A5B]/12 blur-3xl md:block" />
+      <div className="pointer-events-none absolute -bottom-10 left-1/5 hidden size-32 rounded-full bg-[#C9A96E]/10 blur-3xl md:block" />
 
       <div className="relative z-10">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-[12px] bg-gradient-to-br from-[#D88A5B]/18 to-[#C9A96E]/12 border border-[rgba(216,138,91,0.18)]">
+        <div className="mb-5 flex items-start gap-3 md:mb-6 md:items-center">
+          <div className="hidden size-10 items-center justify-center rounded-[12px] border border-[rgba(216,138,91,0.18)] bg-gradient-to-br from-[#D88A5B]/18 to-[#C9A96E]/12 sm:flex">
             <Sparkles className="size-5 text-[#D88A5B]" strokeWidth={1.5} />
           </div>
           <div>
-            <h2 className="font-serif text-xl font-semibold text-[#1F1610]">Create Flashcards</h2>
-            <p className="text-[13px] text-[#6f6257]/70">Configure your AI flashcard session</p>
+            <h2 className="font-serif text-[24px] font-semibold leading-tight text-[#1F1610] md:text-xl">Create Flashcards</h2>
+            <p className="mt-1 text-[14px] leading-relaxed text-[#6f6257]/70 md:mt-0 md:text-[13px]">Configure your AI flashcard session</p>
           </div>
         </div>
 
@@ -519,7 +519,7 @@ function FlashcardForm({ onGenerate, isGenerating }: { onGenerate: (params: { la
           {/* Language */}
           <div>
             <label className="mb-2.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6f6257]/60">Language</label>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
               {(Object.entries(LANGUAGES) as [Language, LanguageConfig][]).map(([key, lang]) => (
                 <motion.button
                   key={key}
@@ -527,7 +527,7 @@ function FlashcardForm({ onGenerate, isGenerating }: { onGenerate: (params: { la
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   className={cn(
-                    "rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-200 border",
+                    "rounded-full border px-3 py-2.5 text-[13px] font-medium transition-all duration-200 md:px-4 md:py-2",
                     language === key
                       ? "bg-[#D88A5B]/14 border-[#D88A5B]/40 text-[#D88A5B] shadow-[0_0_24px_rgba(216,138,91,0.12)]"
                       : "bg-white/45 border-[rgba(210,190,170,0.25)] text-[#6B5D52]/80 hover:border-[#D88A5B]/30 hover:text-[#4A3A2E]"
@@ -553,16 +553,16 @@ function FlashcardForm({ onGenerate, isGenerating }: { onGenerate: (params: { la
         </div>
 
         {/* Count + Level + Generate */}
-        <div className="mt-5 flex flex-wrap items-end gap-4">
-          <div>
+        <div className="mt-5 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
+          <div className="w-full md:w-auto">
             <label className="mb-2.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6f6257]/60">Card Count</label>
-            <div className="flex gap-1.5 rounded-[16px] border border-[rgba(210,190,170,0.22)] bg-white/50 p-1">
+            <div className="flex gap-1.5 rounded-[16px] border border-[rgba(210,190,170,0.22)] bg-white/70 p-1 md:bg-white/50">
               {CARD_COUNTS.map((n) => (
                 <motion.button
                   key={n}
                   onClick={() => setCount(n)}
                   whileTap={{ scale: 0.95 }}
-                  className={cn("relative rounded-[12px] px-4 py-2.5 text-[12px] font-semibold transition-all duration-200", count === n ? "bg-[#2A211C] text-white shadow-lg" : "text-[#6B5D52]/60 hover:text-[#2A211C]")}
+                  className={cn("relative flex-1 rounded-[12px] px-3 py-3 text-[13px] font-semibold transition-all duration-200 md:flex-none md:px-4 md:py-2.5 md:text-[12px]", count === n ? "bg-[#2A211C] text-white shadow-lg" : "text-[#6B5D52]/60 hover:text-[#2A211C]")}
                 >
                   {n}
                 </motion.button>
@@ -572,14 +572,14 @@ function FlashcardForm({ onGenerate, isGenerating }: { onGenerate: (params: { la
 
           <div className="flex-1 min-w-[200px]">
             <label className="mb-2.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6f6257]/60">Difficulty</label>
-            <div className="flex gap-1.5">
+            <div className="grid grid-cols-6 gap-1.5 md:flex">
               {LEVELS.map((lvl) => (
                 <motion.button
                   key={lvl}
                   onClick={() => setLevel(lvl)}
                   whileTap={{ scale: 0.95 }}
                   className={cn(
-                    "flex-1 rounded-[12px] px-3 py-2 text-[12px] font-semibold transition-all duration-200 border",
+                    "flex-1 rounded-[12px] border px-2 py-3 text-[13px] font-semibold transition-all duration-200 md:px-3 md:py-2 md:text-[12px]",
                     level === lvl
                       ? "bg-[#D88A5B]/14 border-[#D88A5B]/35 text-[#D88A5B] shadow-[0_0_24px_rgba(216,138,91,0.12)]"
                       : "bg-white/45 border-[rgba(210,190,170,0.16)] text-[#6B5D52]/60 hover:border-[#D88A5B]/20 hover:text-[#6B5D52]"
@@ -597,7 +597,7 @@ function FlashcardForm({ onGenerate, isGenerating }: { onGenerate: (params: { la
             whileHover={topic.trim() && !isGenerating ? { y: -3, scale: 1.02 } : {}}
             whileTap={topic.trim() && !isGenerating ? { scale: 0.97 } : {}}
             className={cn(
-              "inline-flex items-center gap-2.5 rounded-[18px] px-8 py-4 text-[15px] font-semibold text-white transition-all duration-300 overflow-hidden relative group",
+              "group relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-[18px] px-6 py-4 text-[15px] font-semibold text-white transition-all duration-300 md:w-auto md:px-8",
               isGenerating ? "opacity-70 cursor-not-allowed" : ""
             )}
             style={{ background: "linear-gradient(135deg, #2A1E17, #3D2B1F)", boxShadow: "0 12px 40px rgba(42,33,28,0.22), 0 0 0 1px rgba(255,255,255,0.10) inset" }}
@@ -636,23 +636,23 @@ function QuizForm({ onGenerate, isGenerating }: { onGenerate: (params: { languag
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-[32px] border border-[rgba(210,190,170,0.18)] p-7 md:p-8"
+      className="mobile-flat-glass relative overflow-hidden rounded-[24px] border border-[rgba(210,190,170,0.18)] p-4 sm:p-5 md:rounded-[32px] md:p-8"
       style={{
         background: "linear-gradient(165deg, rgba(255,250,245,0.96), rgba(250,244,235,0.92))",
         boxShadow: "0 28px 88px rgba(42,33,28,0.10), 0 0 0 1px rgba(255,255,255,0.4) inset",
       }}
     >
-      <div className="pointer-events-none absolute -top-8 right-1/4 size-40 rounded-full bg-[#D88A5B]/12 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-10 left-1/5 size-32 rounded-full bg-[#C9A96E]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-8 right-1/4 hidden size-40 rounded-full bg-[#D88A5B]/12 blur-3xl md:block" />
+      <div className="pointer-events-none absolute -bottom-10 left-1/5 hidden size-32 rounded-full bg-[#C9A96E]/10 blur-3xl md:block" />
 
       <div className="relative z-10">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-[12px] bg-gradient-to-br from-[#D88A5B]/18 to-[#C9A96E]/12 border border-[rgba(216,138,91,0.18)]">
+        <div className="mb-5 flex items-start gap-3 md:mb-6 md:items-center">
+          <div className="hidden size-10 items-center justify-center rounded-[12px] border border-[rgba(216,138,91,0.18)] bg-gradient-to-br from-[#D88A5B]/18 to-[#C9A96E]/12 sm:flex">
             <Sword className="size-5 text-[#D88A5B]" strokeWidth={1.5} />
           </div>
           <div>
-            <h2 className="font-serif text-xl font-semibold text-[#1F1610]">Create Quiz</h2>
-            <p className="text-[13px] text-[#6f6257]/70">Configure your AI-generated quiz</p>
+            <h2 className="font-serif text-[24px] font-semibold leading-tight text-[#1F1610] md:text-xl">Create Quiz</h2>
+            <p className="mt-1 text-[14px] leading-relaxed text-[#6f6257]/70 md:mt-0 md:text-[13px]">Configure your AI-generated quiz</p>
           </div>
         </div>
 
@@ -660,7 +660,7 @@ function QuizForm({ onGenerate, isGenerating }: { onGenerate: (params: { languag
           {/* Language */}
           <div>
             <label className="mb-2.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6f6257]/60">Language</label>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
               {(Object.entries(LANGUAGES) as [Language, LanguageConfig][]).map(([key, lang]) => (
                 <motion.button
                   key={key}
@@ -668,7 +668,7 @@ function QuizForm({ onGenerate, isGenerating }: { onGenerate: (params: { languag
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   className={cn(
-                    "rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-200 border",
+                    "rounded-full border px-3 py-2.5 text-[13px] font-medium transition-all duration-200 md:px-4 md:py-2",
                     language === key
                       ? "bg-[#D88A5B]/14 border-[#D88A5B]/40 text-[#D88A5B] shadow-[0_0_24px_rgba(216,138,91,0.12)]"
                       : "bg-white/45 border-[rgba(210,190,170,0.25)] text-[#6B5D52]/80 hover:border-[#D88A5B]/30 hover:text-[#4A3A2E]"
@@ -721,16 +721,16 @@ function QuizForm({ onGenerate, isGenerating }: { onGenerate: (params: { languag
         </div>
 
         {/* Count + Level + Generate */}
-        <div className="mt-5 flex flex-wrap items-end gap-4">
-          <div>
+        <div className="mt-5 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
+          <div className="w-full md:w-auto">
             <label className="mb-2.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6f6257]/60">Questions</label>
-            <div className="flex gap-1.5 rounded-[16px] border border-[rgba(210,190,170,0.22)] bg-white/50 p-1">
+            <div className="flex gap-1.5 rounded-[16px] border border-[rgba(210,190,170,0.22)] bg-white/70 p-1 md:bg-white/50">
               {QUIZ_COUNTS.map((n) => (
                 <motion.button
                   key={n}
                   onClick={() => setCount(n)}
                   whileTap={{ scale: 0.95 }}
-                  className={cn("relative rounded-[12px] px-4 py-2.5 text-[12px] font-semibold transition-all duration-200", count === n ? "bg-[#2A211C] text-white shadow-lg" : "text-[#6B5D52]/60 hover:text-[#2A211C]")}
+                  className={cn("relative flex-1 rounded-[12px] px-3 py-3 text-[13px] font-semibold transition-all duration-200 md:flex-none md:px-4 md:py-2.5 md:text-[12px]", count === n ? "bg-[#2A211C] text-white shadow-lg" : "text-[#6B5D52]/60 hover:text-[#2A211C]")}
                 >
                   {n}
                 </motion.button>
@@ -740,14 +740,14 @@ function QuizForm({ onGenerate, isGenerating }: { onGenerate: (params: { languag
 
           <div className="flex-1 min-w-[200px]">
             <label className="mb-2.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6f6257]/60">Difficulty</label>
-            <div className="flex gap-1.5">
+            <div className="grid grid-cols-6 gap-1.5 md:flex">
               {LEVELS.map((lvl) => (
                 <motion.button
                   key={lvl}
                   onClick={() => setLevel(lvl)}
                   whileTap={{ scale: 0.95 }}
                   className={cn(
-                    "flex-1 rounded-[12px] px-3 py-2 text-[12px] font-semibold transition-all duration-200 border",
+                    "flex-1 rounded-[12px] border px-2 py-3 text-[13px] font-semibold transition-all duration-200 md:px-3 md:py-2 md:text-[12px]",
                     level === lvl
                       ? "bg-[#D88A5B]/14 border-[#D88A5B]/35 text-[#D88A5B] shadow-[0_0_24px_rgba(216,138,91,0.12)]"
                       : "bg-white/45 border-[rgba(210,190,170,0.16)] text-[#6B5D52]/60 hover:border-[#D88A5B]/20 hover:text-[#6B5D52]"
@@ -765,7 +765,7 @@ function QuizForm({ onGenerate, isGenerating }: { onGenerate: (params: { languag
             whileHover={topic.trim() && !isGenerating ? { y: -3, scale: 1.02 } : {}}
             whileTap={topic.trim() && !isGenerating ? { scale: 0.97 } : {}}
             className={cn(
-              "inline-flex items-center gap-2.5 rounded-[18px] px-8 py-4 text-[15px] font-semibold text-white transition-all duration-300 overflow-hidden relative group",
+              "group relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-[18px] px-6 py-4 text-[15px] font-semibold text-white transition-all duration-300 md:w-auto md:px-8",
               isGenerating ? "opacity-70 cursor-not-allowed" : ""
             )}
             style={{ background: "linear-gradient(135deg, #2A1E17, #3D2B1F)", boxShadow: "0 12px 40px rgba(42,33,28,0.22), 0 0 0 1px rgba(255,255,255,0.10) inset" }}
@@ -1851,15 +1851,15 @@ export default function FlashcardsPage() {
         <div className="cinematic-page fixed inset-0" />
         <div className="workspace-fog fixed inset-0 pointer-events-none" />
 
-        <div className="pointer-events-none fixed right-[8%] top-[15%] size-[700px] rounded-full bg-gradient-to-br from-[#D88A5B]/6 via-[#C9A96E]/4 to-transparent blur-[180px]" />
-        <div className="pointer-events-none fixed bottom-[8%] left-[3%] size-[600px] rounded-full bg-gradient-to-tr from-[#C9A96E]/5 via-[#D88A5B]/3 to-transparent blur-[140px]" />
-        <div className="pointer-events-none fixed left-[40%] top-[50%] size-[500px] rounded-full bg-[#FFF5E6]/15 blur-[120px]" />
+        <div className="pointer-events-none fixed right-[8%] top-[15%] hidden size-[700px] rounded-full bg-gradient-to-br from-[#D88A5B]/6 via-[#C9A96E]/4 to-transparent blur-[180px] md:block" />
+        <div className="pointer-events-none fixed bottom-[8%] left-[3%] hidden size-[600px] rounded-full bg-gradient-to-tr from-[#C9A96E]/5 via-[#D88A5B]/3 to-transparent blur-[140px] md:block" />
+        <div className="pointer-events-none fixed left-[40%] top-[50%] hidden size-[500px] rounded-full bg-[#FFF5E6]/15 blur-[120px] md:block" />
 
         <FloatingDust />
 
-        <div className="relative z-10 mx-auto max-w-5xl px-6 pt-12 pb-24">
+        <div className="mobile-quiet-motion relative z-10 mx-auto max-w-5xl px-3 pb-24 pt-4 sm:px-5 md:px-6 md:pt-12">
             {/* Header */}
-            <div className="mb-10 flex items-center justify-between">
+            <div className="mb-6 flex items-center justify-between md:mb-10">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8d8175]/45">Flashcards Studio</p>
 
               {(showPlayer || showQuiz || showSummary) && (

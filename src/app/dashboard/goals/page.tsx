@@ -119,7 +119,7 @@ function FloatingDust() {
   );
 
   return (
-    <div className="pointer-events-none fixed inset-0 ml-[220px] overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 ml-[220px] hidden overflow-hidden md:block">
       {dust.map((d) => (
         <motion.div
           key={d.id}
@@ -402,7 +402,7 @@ function StatsRow({ stats }: { stats: { active: number; completed: number; rate:
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.4 }}
-      className="mb-10 grid grid-cols-2 gap-3 md:grid-cols-4"
+      className="mb-8 grid grid-cols-2 gap-2.5 md:mb-10 md:grid-cols-4 md:gap-3"
     >
       {cards.map((card) => {
         const Icon = card.icon;
@@ -410,7 +410,7 @@ function StatsRow({ stats }: { stats: { active: number; completed: number; rate:
           <motion.div
             key={card.label}
             whileHover={{ y: -3, scale: 1.02 }}
-            className="group relative overflow-hidden rounded-[16px] border border-[rgba(210,190,170,0.18)] bg-white/55 p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 hover:shadow-[0_8px_28px_rgba(42,33,28,0.07)] hover:border-[rgba(216,138,91,0.18)]"
+            className="group relative overflow-hidden rounded-[16px] border border-[rgba(210,190,170,0.18)] bg-white/70 p-3 transition-all duration-300 hover:border-[rgba(216,138,91,0.18)] hover:bg-white/80 hover:shadow-[0_8px_28px_rgba(42,33,28,0.07)] md:bg-white/55 md:p-4 md:backdrop-blur-sm"
           >
             <div className="pointer-events-none absolute -right-6 -top-6 size-20 rounded-full opacity-0 transition-all duration-300 group-hover:opacity-100 blur-2xl"
               style={{ background: `${card.color}12` }}
@@ -439,13 +439,13 @@ function ModeSelector({
   onSelect: (mode: "goals" | "completed") => void;
 }) {
   return (
-    <div className="mb-10 grid grid-cols-2 gap-4">
+    <div className="mb-8 grid grid-cols-2 gap-3 md:mb-10 md:gap-4">
       <motion.button
         onClick={() => onSelect("goals")}
         whileHover={{ y: -4, scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className={cn(
-          "relative overflow-hidden rounded-[24px] border-2 p-7 text-left transition-all duration-300",
+          "mobile-flat-glass relative overflow-hidden rounded-[22px] border-2 p-4 text-left transition-all duration-300 sm:p-5 md:rounded-[24px] md:p-7",
           activeMode === "goals"
             ? "border-[#D88A5B]/40 bg-[#D88A5B]/8 shadow-[0_12px_40px_rgba(216,138,91,0.12)]"
             : "border-[rgba(210,190,170,0.20)] bg-white/60 hover:border-[#D88A5B]/25 hover:bg-white/80 hover:shadow-[0_8px_24px_rgba(42,33,28,0.06)]"
@@ -453,14 +453,14 @@ function ModeSelector({
         style={activeMode === "goals" ? { background: "linear-gradient(135deg, rgba(216,138,91,0.10), rgba(201,169,110,0.05))" } : {}}
       >
         {activeMode === "goals" && (
-          <motion.div layoutId="modeBg" className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full bg-[#D88A5B]/10 blur-3xl" />
+          <motion.div layoutId="modeBg" className="pointer-events-none absolute -right-8 -top-8 hidden size-40 rounded-full bg-[#D88A5B]/10 blur-3xl md:block" />
         )}
         <div className="relative z-10">
-          <div className={cn("mb-4 flex size-14 items-center justify-center rounded-[16px] transition-all", activeMode === "goals" ? "bg-[#2A211C] shadow-lg" : "bg-[rgba(232,218,200,0.3)]")}>
-            <ListTodo className={cn("size-6", activeMode === "goals" ? "text-white" : "text-[#D88A5B]")} strokeWidth={1.5} />
+          <div className={cn("mb-4 flex size-12 items-center justify-center rounded-[16px] transition-all md:size-14", activeMode === "goals" ? "bg-[#2A211C] shadow-lg" : "bg-[rgba(232,218,200,0.3)]")}>
+            <ListTodo className={cn("size-5 md:size-6", activeMode === "goals" ? "text-white" : "text-[#D88A5B]")} strokeWidth={1.5} />
           </div>
-          <h3 className="font-serif text-[22px] font-semibold text-[#1F1610]">Active Goals</h3>
-          <p className="mt-1.5 text-[13px] text-[#6f6257]/70 leading-relaxed">Manage your current learning milestones and habits. Create, track, and prioritize goals.</p>
+          <h3 className="font-serif text-[22px] font-semibold leading-tight text-[#1F1610]">Active Goals</h3>
+          <p className="mt-2 text-[13px] leading-relaxed text-[#6f6257]/70 md:mt-1.5">Manage current milestones and learning habits.</p>
         </div>
       </motion.button>
 
@@ -469,7 +469,7 @@ function ModeSelector({
         whileHover={{ y: -4, scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className={cn(
-          "relative overflow-hidden rounded-[24px] border-2 p-7 text-left transition-all duration-300",
+          "mobile-flat-glass relative overflow-hidden rounded-[22px] border-2 p-4 text-left transition-all duration-300 sm:p-5 md:rounded-[24px] md:p-7",
           activeMode === "completed"
             ? "border-[#D88A5B]/40 bg-[#D88A5B]/8 shadow-[0_12px_40px_rgba(216,138,91,0.12)]"
             : "border-[rgba(210,190,170,0.20)] bg-white/60 hover:border-[#D88A5B]/25 hover:bg-white/80 hover:shadow-[0_8px_24px_rgba(42,33,28,0.06)]"
@@ -477,14 +477,14 @@ function ModeSelector({
         style={activeMode === "completed" ? { background: "linear-gradient(135deg, rgba(216,138,91,0.10), rgba(201,169,110,0.05))" } : {}}
       >
         {activeMode === "completed" && (
-          <motion.div layoutId="modeBg" className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full bg-[#D88A5B]/10 blur-3xl" />
+          <motion.div layoutId="modeBg" className="pointer-events-none absolute -right-8 -top-8 hidden size-40 rounded-full bg-[#D88A5B]/10 blur-3xl md:block" />
         )}
         <div className="relative z-10">
-          <div className={cn("mb-4 flex size-14 items-center justify-center rounded-[16px] transition-all", activeMode === "completed" ? "bg-[#2A211C] shadow-lg" : "bg-[rgba(232,218,200,0.3)]")}>
-            <Archive className={cn("size-6", activeMode === "completed" ? "text-white" : "text-[#D88A5B]")} strokeWidth={1.5} />
+          <div className={cn("mb-4 flex size-12 items-center justify-center rounded-[16px] transition-all md:size-14", activeMode === "completed" ? "bg-[#2A211C] shadow-lg" : "bg-[rgba(232,218,200,0.3)]")}>
+            <Archive className={cn("size-5 md:size-6", activeMode === "completed" ? "text-white" : "text-[#D88A5B]")} strokeWidth={1.5} />
           </div>
-          <h3 className="font-serif text-[22px] font-semibold text-[#1F1610]">Completed Goals</h3>
-          <p className="mt-1.5 text-[13px] text-[#6f6257]/70 leading-relaxed">Review finished milestones and track your progress. Celebrate your achievements.</p>
+          <h3 className="font-serif text-[22px] font-semibold leading-tight text-[#1F1610]">Completed Goals</h3>
+          <p className="mt-2 text-[13px] leading-relaxed text-[#6f6257]/70 md:mt-1.5">Review finished milestones and progress.</p>
         </div>
       </motion.button>
     </div>
@@ -924,16 +924,16 @@ export default function GoalsPage() {
       <div className="cinematic-page fixed inset-0 ml-[220px]" />
       <div className="workspace-fog fixed inset-0 ml-[220px] pointer-events-none" />
 
-      <div className="pointer-events-none fixed right-[8%] top-[15%] size-[700px] rounded-full bg-gradient-to-br from-[#D88A5B]/6 via-[#C9A96E]/4 to-transparent blur-[180px]" />
-      <div className="pointer-events-none fixed bottom-[8%] left-[3%] size-[600px] rounded-full bg-gradient-to-tr from-[#C9A96E]/5 via-[#D88A5B]/3 to-transparent blur-[140px]" />
-      <div className="pointer-events-none fixed left-[40%] top-[50%] size-[500px] rounded-full bg-[#FFF5E6]/15 blur-[120px]" />
+      <div className="pointer-events-none fixed right-[8%] top-[15%] hidden size-[700px] rounded-full bg-gradient-to-br from-[#D88A5B]/6 via-[#C9A96E]/4 to-transparent blur-[180px] md:block" />
+      <div className="pointer-events-none fixed bottom-[8%] left-[3%] hidden size-[600px] rounded-full bg-gradient-to-tr from-[#C9A96E]/5 via-[#D88A5B]/3 to-transparent blur-[140px] md:block" />
+      <div className="pointer-events-none fixed left-[40%] top-[50%] hidden size-[500px] rounded-full bg-[#FFF5E6]/15 blur-[120px] md:block" />
 
       {/* Confetti overlay */}
       <AnimatePresence>{showConfetti && <ConfettiBurst />}</AnimatePresence>
 
-        <div className="relative z-10 mx-auto max-w-5xl px-6 pt-12 pb-24">
+        <div className="mobile-quiet-motion relative z-10 mx-auto max-w-5xl px-3 pb-24 pt-4 sm:px-5 md:px-6 md:pt-12">
           {/* Header */}
-          <div className="mb-10 flex items-center justify-between">
+          <div className="mb-6 flex items-center justify-between md:mb-10">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8d8175]/45">Goals Tracker</p>
           </div>
 

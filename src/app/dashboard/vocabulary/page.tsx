@@ -217,7 +217,7 @@ function FloatingDust() {
   const [dust] = useState(() => generateDust(25));
 
   return (
-    <div className="pointer-events-none fixed inset-0 ml-[220px] overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 ml-[220px] hidden overflow-hidden md:block">
       {dust.map((d) => (
         <motion.div
           key={d.id}
@@ -463,15 +463,15 @@ function AiGeneratorPanel({
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-      className="relative z-20 mb-12 overflow-visible rounded-[32px] border border-[rgba(210,190,170,0.18)] transition-all duration-500"
+      className="mobile-flat-glass relative z-20 mb-8 overflow-visible rounded-[24px] border border-[rgba(210,190,170,0.18)] transition-all duration-300 md:mb-12 md:rounded-[32px] md:duration-500"
       style={{
         background: "linear-gradient(165deg, rgba(255,250,245,0.96), rgba(250,244,235,0.92))",
         backdropFilter: "blur(18px)",
         boxShadow: "0 28px 88px rgba(42,33,28,0.10), 0 0 0 1px rgba(255,255,255,0.4) inset, 0 -1px 0 rgba(255,255,255,0.6) inset",
       }}
     >
-      <div className="pointer-events-none absolute -top-8 right-1/4 size-40 rounded-full bg-[#D88A5B]/12 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-10 left-1/5 size-32 rounded-full bg-[#C9A96E]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-8 right-1/4 hidden size-40 rounded-full bg-[#D88A5B]/12 blur-3xl md:block" />
+      <div className="pointer-events-none absolute -bottom-10 left-1/5 hidden size-32 rounded-full bg-[#C9A96E]/10 blur-3xl md:block" />
       <div
         className="pointer-events-none absolute inset-0 rounded-[32px] opacity-[0.020] mix-blend-multiply"
         style={{
@@ -479,25 +479,25 @@ function AiGeneratorPanel({
         }}
       />
 
-      <div className="relative z-10 px-6 py-8 md:px-8 md:py-9">
-        <div className="mb-6 flex items-center gap-3">
+      <div className="relative z-10 px-4 py-5 sm:px-5 md:px-8 md:py-9">
+        <div className="mb-5 flex items-start gap-3 md:mb-6 md:items-center">
           <motion.div
             whileHover={{ rotate: 20, scale: 1.08 }}
-            className="flex size-10 items-center justify-center rounded-[12px] bg-gradient-to-br from-[#D88A5B]/18 to-[#C9A96E]/12 border border-[rgba(216,138,91,0.18)]"
+            className="hidden size-10 items-center justify-center rounded-[12px] border border-[rgba(216,138,91,0.18)] bg-gradient-to-br from-[#D88A5B]/18 to-[#C9A96E]/12 sm:flex"
           >
             <Sparkles className="size-5 text-[#D88A5B]" strokeWidth={1.5} />
           </motion.div>
           <div>
-            <h2 className="font-serif text-xl font-semibold tracking-tight text-[#1F1610]">AI Vocabulary Generator</h2>
-            <p className="text-[13px] text-[#8d8175]/65">Generate custom vocabulary lists powered by AI</p>
+            <h2 className="font-serif text-[24px] font-semibold leading-tight tracking-tight text-[#1F1610] md:text-xl">AI Vocabulary Generator</h2>
+            <p className="mt-1 text-[14px] leading-relaxed text-[#8d8175]/65 md:mt-0 md:text-[13px]">Generate custom vocabulary lists powered by AI</p>
           </div>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-4">
           {/* Language */}
           <div>
             <label className="mb-2.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8d8175]/65">Language</label>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
               {(Object.entries(LANGUAGES) as [Language, LanguageConfig][]).map(([key, lang]) => (
                 <motion.button
                   key={key}
@@ -505,7 +505,7 @@ function AiGeneratorPanel({
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   className={cn(
-                    "relative rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-200 border",
+                    "relative rounded-full border px-3 py-2.5 text-[13px] font-medium transition-all duration-200 md:px-4 md:py-2",
                     language === key
                       ? "bg-[#D88A5B]/14 border-[#D88A5B]/35 text-[#D88A5B] shadow-[0_0_24px_rgba(216,138,91,0.12)]"
                       : "bg-white/45 border-[rgba(210,190,170,0.22)] text-[#6B5D52]/75 hover:border-[#D88A5B]/30 hover:text-[#6B5D52] hover:bg-white/65"
@@ -534,7 +534,7 @@ function AiGeneratorPanel({
                 placeholder="What vocabulary would you like to learn?"
                 rows={1}
                 className={cn(
-                  "w-full resize-none rounded-[16px] border bg-white/55 px-4 py-3 pr-10 text-[14px] text-[#2A211C] placeholder:text-[#2A211C]/35 transition-all duration-200 focus:outline-none",
+                  "w-full resize-none rounded-[16px] border bg-white/75 px-4 py-3.5 pr-10 text-[16px] text-[#2A211C] placeholder:text-[#2A211C]/35 transition-all duration-200 focus:outline-none md:bg-white/55 md:py-3 md:text-[14px]",
                   focusField === "topic" ? "border-[#D88A5B]/40 ring-[4px] ring-[#D88A5B]/10" : "border-[rgba(210,190,170,0.25)]"
                 )}
               />
@@ -574,14 +574,14 @@ function AiGeneratorPanel({
           {/* Word Count */}
           <div>
             <label className="mb-2.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8d8175]/65">Word Count</label>
-            <div className="flex gap-1.5 rounded-[16px] border border-[rgba(210,190,170,0.22)] bg-white/50 p-1">
+            <div className="flex gap-1 rounded-[16px] border border-[rgba(210,190,170,0.22)] bg-white/70 p-1 md:gap-1.5 md:bg-white/50">
               {WORD_COUNTS.map((n) => (
                 <motion.button
                   key={n}
                   onClick={() => setCount(n)}
                   whileTap={{ scale: 0.95 }}
                   className={cn(
-                    "relative flex-1 rounded-[12px] px-2 py-2.5 text-[12px] font-semibold transition-all duration-200",
+                    "relative flex-1 rounded-[12px] px-1.5 py-3 text-[13px] font-semibold transition-all duration-200 md:px-2 md:py-2.5 md:text-[12px]",
                     count === n ? "bg-[#2A211C] text-white shadow-lg" : "text-[#6B5D52]/60 hover:text-[#2A211C] hover:bg-white/55"
                   )}
                 >
@@ -596,17 +596,17 @@ function AiGeneratorPanel({
         </div>
 
         {/* Difficulty + Generate */}
-        <div className="mt-6 flex flex-wrap items-end gap-4">
+        <div className="mt-5 flex flex-col gap-4 md:mt-6 md:flex-row md:flex-wrap md:items-end">
           <div className="flex-1 min-w-[200px]">
             <label className="mb-2.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8d8175]/65">Difficulty Level</label>
-            <div className="flex gap-1.5">
+            <div className="grid grid-cols-6 gap-1.5 md:flex">
               {LEVELS.map((lvl) => (
                 <motion.button
                   key={lvl}
                   onClick={() => setLevel(lvl)}
                   whileTap={{ scale: 0.95 }}
                   className={cn(
-                    "relative flex-1 rounded-[12px] px-3 py-2 text-[12px] font-semibold transition-all duration-200 border",
+                    "relative flex-1 rounded-[12px] border px-2 py-3 text-[13px] font-semibold transition-all duration-200 md:px-3 md:py-2 md:text-[12px]",
                     level === lvl
                       ? "bg-[#D88A5B]/14 border-[#D88A5B]/35 text-[#D88A5B] shadow-[0_0_24px_rgba(216,138,91,0.12)]"
                       : "bg-white/45 border-[rgba(210,190,170,0.16)] text-[#6B5D52]/60 hover:border-[#D88A5B]/20 hover:text-[#6B5D52]"
@@ -624,7 +624,7 @@ function AiGeneratorPanel({
             whileHover={topic.trim() && !isGenerating ? { scale: 1.02, y: -3 } : {}}
             whileTap={topic.trim() && !isGenerating ? { scale: 0.97 } : {}}
             className={cn(
-              "group relative inline-flex items-center gap-2.5 rounded-[18px] px-8 py-3.5 text-[15px] font-semibold tracking-tight text-white transition-all duration-300 overflow-hidden",
+              "group relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-[18px] px-6 py-4 text-[15px] font-semibold tracking-tight text-white transition-all duration-300 md:w-auto md:px-8 md:py-3.5",
               isGenerating ? "opacity-70 cursor-not-allowed" : "hover:shadow-[0_28px_64px_rgba(42,33,28,0.28)]"
             )}
             style={{
@@ -1524,10 +1524,10 @@ export default function VocabularyPage() {
         <div className="workspace-fog fixed inset-0 pointer-events-none" />
 
         {/* Warm radial glows */}
-        <div className="pointer-events-none fixed right-[8%] top-[15%] size-[700px] rounded-full bg-gradient-to-br from-[#D88A5B]/6 via-[#C9A96E]/4 to-transparent blur-[180px]" />
-        <div className="pointer-events-none fixed bottom-[8%] left-[3%] size-[600px] rounded-full bg-gradient-to-tr from-[#C9A96E]/5 via-[#D88A5B]/3 to-transparent blur-[140px]" />
-        <div className="pointer-events-none fixed left-[40%] top-[50%] size-[500px] rounded-full bg-[#FFF5E6]/15 blur-[120px]" />
-        <div className="pointer-events-none fixed left-[10%] top-[20%] size-[400px] rounded-full bg-[#8B9D83]/4 blur-[100px]" />
+        <div className="pointer-events-none fixed right-[8%] top-[15%] hidden size-[700px] rounded-full bg-gradient-to-br from-[#D88A5B]/6 via-[#C9A96E]/4 to-transparent blur-[180px] md:block" />
+        <div className="pointer-events-none fixed bottom-[8%] left-[3%] hidden size-[600px] rounded-full bg-gradient-to-tr from-[#C9A96E]/5 via-[#D88A5B]/3 to-transparent blur-[140px] md:block" />
+        <div className="pointer-events-none fixed left-[40%] top-[50%] hidden size-[500px] rounded-full bg-[#FFF5E6]/15 blur-[120px] md:block" />
+        <div className="pointer-events-none fixed left-[10%] top-[20%] hidden size-[400px] rounded-full bg-[#8B9D83]/4 blur-[100px] md:block" />
 
         {/* Watercolor paper texture overlay */}
         <div
@@ -1548,9 +1548,9 @@ export default function VocabularyPage() {
         {/* Floating dust motes */}
         <FloatingDust />
 
-        <div className="relative z-10 mx-auto max-w-6xl px-6 pt-12 pb-24">
+        <div className="mobile-quiet-motion relative z-10 mx-auto max-w-6xl px-3 pb-24 pt-4 sm:px-5 md:px-6 md:pt-12">
             {/* Header bar - no breadcrumb, just breathing room */}
-            <div className="mb-10 flex items-center justify-between">
+            <div className="mb-6 flex items-center justify-between md:mb-10">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8d8175]/45">Vocabulary</p>
               </div>
@@ -1617,12 +1617,12 @@ export default function VocabularyPage() {
             )}
 
             <div>
-              <div className="mb-5 flex items-end justify-between">
+              <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <h2 className="font-serif text-[26px] font-semibold text-[#2B1B12] leading-tight">{showLibrary ? "My Vocabulary Library" : "Your Vocabulary Library"}</h2>
                   <p className="mt-1 text-[13px] text-[#8d8175]/60">Your AI-generated language vault.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   {learningCount > 0 && (
                     <motion.button
                       initial={{ opacity: 0, scale: 0.9 }}
@@ -1670,7 +1670,7 @@ export default function VocabularyPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="relative mb-8 flex gap-1.5 rounded-[16px] p-1.5"
+                className="relative mb-8 flex gap-1 rounded-[16px] p-1 md:gap-1.5 md:p-1.5"
                 style={{
                   background: "rgba(255,248,243,0.80)",
                   border: "1px solid rgba(205,170,140,0.14)",
@@ -1686,7 +1686,7 @@ export default function VocabularyPage() {
                       onClick={() => setActiveTab(tab.key)}
                       whileTap={{ scale: 0.97 }}
                       className={cn(
-                        "relative flex flex-1 items-center justify-center gap-2 rounded-[12px] px-4 py-2.5 text-[13px] font-semibold transition-all duration-200",
+                        "relative flex flex-1 items-center justify-center gap-1.5 rounded-[12px] px-2 py-2.5 text-[12px] font-semibold transition-all duration-200 sm:gap-2 md:px-4 md:text-[13px]",
                         isActive ? "text-[#2B1B12]" : "text-[#7A6A5E]/50 hover:text-[#6B5D52]"
                       )}
                     >
