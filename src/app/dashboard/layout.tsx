@@ -66,7 +66,7 @@ export default function DashboardLayout({
 
           <button
             onClick={() => setIsPomodoroOpen((prev) => !prev)}
-            className={`group fixed bottom-7 right-7 z-50 flex size-[68px] items-center justify-center rounded-full transition-all duration-[350ms] ease-out hover:-translate-y-1 hover:scale-[1.04] ${
+            className={`group fixed bottom-24 right-5 z-50 flex size-14 items-center justify-center rounded-full transition-all duration-[350ms] ease-out hover:-translate-y-1 hover:scale-[1.04] md:bottom-7 md:right-7 md:size-[68px] ${
               isPomodoroOpen
                 ? "scale-[0.96] opacity-80 shadow-[0_8px_24px_rgba(40,20,10,0.15)]"
                 : "shadow-[0_14px_40px_rgba(40,20,10,0.25),0_0_40px_rgba(220,170,110,0.18)] hover:shadow-[0_20px_50px_rgba(40,20,10,0.35),0_0_60px_rgba(220,170,110,0.25)]"
@@ -108,8 +108,8 @@ export default function DashboardLayout({
       )}
 
       {/* Main content area — offset by sidebar width */}
-      <div className="relative z-10 pl-[220px]">
-        <main className="mx-auto max-w-[1440px] px-8 py-5">
+      <div className="relative z-10 md:pl-[220px]">
+        <main className="mx-auto max-w-[1440px] px-4 pb-28 pt-4 sm:px-6 md:px-8 md:py-5">
           {children}
         </main>
       </div>

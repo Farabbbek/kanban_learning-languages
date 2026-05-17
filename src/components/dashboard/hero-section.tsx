@@ -66,7 +66,7 @@ export function HeroSection({
       <img
         src="/compas.png"
         alt=""
-        className="pointer-events-none absolute select-none"
+        className="pointer-events-none absolute hidden select-none sm:block"
         style={{
           right: "36px",
           top: "50%",
@@ -82,11 +82,11 @@ export function HeroSection({
       />
 
       {/* Content */}
-      <div className="relative px-7 py-6">
-        <div className="flex items-center justify-between">
+      <div className="relative px-5 py-5 sm:px-7 sm:py-6">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           {/* Left: Greeting */}
-          <div>
-            <h1 className="font-serif text-[24px] font-medium tracking-tight text-[#1F1610] sm:text-[28px] leading-[1.1]">
+          <div className="min-w-0">
+            <h1 className="font-serif text-[24px] font-medium leading-[1.1] tracking-tight text-[#1F1610] sm:text-[28px]">
               {greeting}, {displayName?.split(" ")[0] ?? "Learner"}.
             </h1>
             <p className="mt-1.5 text-sm font-medium leading-relaxed" style={{ color: "rgba(100,80,65,0.65)" }}>
@@ -94,10 +94,10 @@ export function HeroSection({
             </p>
 
             {/* Action buttons */}
-            <div className="mt-4 flex items-center gap-3">
+            <div className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
               <a
                 href="/dashboard/learn"
-                className="tactile-button inline-flex items-center gap-2 rounded-xl bg-[#2A211C] px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_12px_rgba(42,33,28,0.2)] hover:bg-[#3D322B] hover:shadow-[0_6px_16px_rgba(42,33,28,0.25)]"
+                className="tactile-button inline-flex items-center justify-center gap-2 rounded-xl bg-[#2A211C] px-4 py-2.5 text-xs font-semibold text-white shadow-[0_4px_12px_rgba(42,33,28,0.2)] hover:bg-[#3D322B] hover:shadow-[0_6px_16px_rgba(42,33,28,0.25)] sm:py-2"
               >
                 <Sparkles className="size-3.5" strokeWidth={1.8} />
                 Continue Learning
@@ -105,7 +105,7 @@ export function HeroSection({
               </a>
               <a
                 href="/dashboard/flashcards"
-                className="tactile-button inline-flex items-center gap-2 rounded-xl border border-[#D88A5B]/15 bg-white/70 px-4 py-2 text-xs font-semibold text-[#2A211C] shadow-sm backdrop-blur-md hover:bg-white/90 hover:shadow-md"
+                className="tactile-button inline-flex items-center justify-center gap-2 rounded-xl border border-[#D88A5B]/15 bg-white/70 px-4 py-2.5 text-xs font-semibold text-[#2A211C] shadow-sm backdrop-blur-md hover:bg-white/90 hover:shadow-md sm:py-2"
               >
                 <Clock className="size-3.5" strokeWidth={1.8} />
                 Quick Review
@@ -115,7 +115,7 @@ export function HeroSection({
 
           {/* Right: Daily goal — frosted glass container */}
           <div
-            className="flex items-center gap-3 rounded-xl px-4 py-2.5"
+            className="flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 md:w-auto md:justify-start md:py-2.5"
             style={{
               background: "rgba(255,255,255,0.35)",
               backdropFilter: "blur(10px)",
@@ -127,7 +127,7 @@ export function HeroSection({
               <span className="size-2 rounded-full bg-[#D88A5B]" />
               {todayMinutes}m / {dailyGoal}m
             </span>
-            <div className="h-1.5 w-20 overflow-hidden rounded-full bg-[#2A211C]/8">
+            <div className="h-1.5 w-24 overflow-hidden rounded-full bg-[#2A211C]/8 md:w-20">
               <div
                 className="h-full rounded-full bg-[#2A211C] transition-all duration-700 ease-out"
                 style={{ width: `${progressPercent}%` }}

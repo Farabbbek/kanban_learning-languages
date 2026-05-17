@@ -58,6 +58,12 @@
     overflow-x: hidden;
     -webkit-tap-highlight-color: rgba(199, 70, 46, 0.16);
   }
+
+  @media (max-width: 767px) {
+    .ml-\[220px\] {
+      margin-left: 0;
+    }
+  }
   html {
     @apply font-sans;
     scroll-behavior: smooth;

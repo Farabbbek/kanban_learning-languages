@@ -48,7 +48,7 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
 
   return (
     <aside
-      className="fixed left-0 top-0 z-40 flex h-screen w-[220px] flex-col border-r border-[rgba(210,190,170,0.22)] shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_0_60px_rgba(210,180,140,0.12)]"
+      className="fixed inset-x-3 bottom-3 z-40 flex h-[76px] flex-col overflow-hidden rounded-[22px] border border-[rgba(210,190,170,0.34)] shadow-[0_18px_54px_rgba(42,33,28,0.18),inset_0_1px_0_rgba(255,255,255,0.55)] md:inset-x-auto md:bottom-auto md:left-0 md:top-0 md:h-screen md:w-[220px] md:rounded-none md:border-r md:border-[rgba(210,190,170,0.22)] md:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_0_60px_rgba(210,180,140,0.12)]"
       style={{
         backgroundColor: "rgba(250,246,240,0.92)",
         backdropFilter: "blur(12px)",
@@ -77,9 +77,9 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
       />
 
       {/* ========== CONTENT ========== */}
-      <div className="relative z-10 flex h-full flex-col">
+      <div className="relative z-10 flex h-full flex-col md:flex-col">
         {/* ========== LOGO ========== */}
-        <div className="flex items-center gap-2.5 px-5 pt-6 pb-5">
+        <div className="hidden items-center gap-2.5 px-5 pb-5 pt-6 md:flex">
           <div className="relative flex size-[32px] items-center justify-center rounded-xl bg-[#F4ECE4] shadow-[0_6px_20px_rgba(120,80,40,0.08)]">
             <Orbit className="size-[16px] text-[#D57B45]" strokeWidth={1.8} />
           </div>
@@ -93,12 +93,12 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
         </div>
 
         {/* ========== NAVIGATION ========== */}
-        <nav className="flex-1 px-3 py-1">
-          <div className="mb-3 px-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#8d8175]/50">
+        <nav className="flex-1 overflow-x-auto px-2 py-2 md:overflow-visible md:px-3 md:py-1">
+          <div className="mb-3 hidden px-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#8d8175]/50 md:block">
             Menu
           </div>
 
-          <div className="space-y-0.5">
+          <div className="flex min-w-max items-center gap-1 md:block md:min-w-0 md:space-y-0.5">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
@@ -108,7 +108,7 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 ease-out",
+                    "group relative flex min-w-[64px] flex-col items-center justify-center gap-1 rounded-2xl px-2.5 py-2 text-[10px] font-semibold transition-all duration-200 ease-out md:min-w-0 md:flex-row md:justify-start md:gap-3 md:rounded-xl md:px-3 md:py-2.5 md:text-[13px] md:font-medium",
                     isActive
                       ? "bg-[rgba(255,250,245,0.95)] text-[#1F1610] shadow-[0_8px_24px_rgba(180,140,100,0.10)] border border-[#D88A5B]/10"
                       : "text-[#6B5D52] hover:translate-x-[2px] hover:bg-[rgba(255,250,245,0.5)] hover:text-[#1F1610]"
@@ -116,7 +116,7 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
                 >
                   <Icon
                     className={cn(
-                      "size-4 shrink-0 transition-all duration-200 ease-out",
+                      "size-5 shrink-0 transition-all duration-200 ease-out md:size-4",
                       isActive
                         ? "text-[#D88A5B]"
                         : "text-[#8d8175]/70 group-hover:text-[#2A211C]/80",
@@ -124,12 +124,12 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
                     )}
                     strokeWidth={isActive ? 2 : 1.5}
                   />
-                  <span className={cn(item.soon && !isActive && "opacity-50")}>{item.label}</span>
+                  <span className={cn("max-w-[58px] truncate md:max-w-none", item.soon && !isActive && "opacity-50")}>{item.label}</span>
 
                   {item.soon && (
                     <span
                       className={cn(
-                        "ml-auto inline-flex items-center rounded-full px-1.5 py-[2px] text-[7px] font-bold uppercase tracking-[0.12em]",
+                        "ml-auto hidden items-center rounded-full px-1.5 py-[2px] text-[7px] font-bold uppercase tracking-[0.12em] md:inline-flex",
                         isActive
                           ? "bg-[#D88A5B]/15 text-[#D88A5B]"
                           : "bg-gradient-to-r from-[#D88A5B]/12 to-[#C9A96E]/12 text-[#D88A5B]/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
@@ -141,7 +141,7 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
                   )}
 
                   {isActive && !item.soon && (
-                    <span className="absolute right-2.5 size-1.5 rounded-full bg-[#D88A5B] shadow-[0_0_6px_rgba(216,138,91,0.35)]" />
+                    <span className="absolute bottom-1.5 size-1 rounded-full bg-[#D88A5B] shadow-[0_0_6px_rgba(216,138,91,0.35)] md:bottom-auto md:right-2.5 md:size-1.5" />
                   )}
                 </Link>
               );
@@ -150,7 +150,7 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
         </nav>
 
         {/* ========== PROFILE CARD ========== */}
-        <div className="px-3 pt-1 pb-2.5">
+        <div className="hidden px-3 pb-2.5 pt-1 md:block">
           <div className="group flex items-center gap-3 rounded-xl bg-[rgba(255,250,245,0.85)] backdrop-blur-[8px] px-3 py-2.5 shadow-[0_2px_12px_rgba(42,33,28,0.05),0_0_0_1px_rgba(216,138,91,0.06)] cursor-pointer transition-all duration-200 hover:shadow-[0_8px_24px_rgba(42,33,28,0.08)] hover:-translate-y-0.5">
             {/* Avatar */}
             <div className="relative shrink-0">
@@ -185,7 +185,7 @@ export function Sidebar({ displayName: propName, streak: propStreak }: SidebarPr
         </div>
 
         {/* ========== STREAK ========== */}
-        <div className="px-3 pb-5">
+        <div className="hidden px-3 pb-5 md:block">
           <div
             className="flex items-center gap-3 rounded-[22px] px-3.5 py-3.5"
             style={{

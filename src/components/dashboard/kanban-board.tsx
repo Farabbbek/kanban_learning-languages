@@ -92,8 +92,8 @@ export function KanbanBoard({
   return (
     <div>
       {/* Header — editorial, dominant */}
-      <div className="mb-5 flex items-center justify-between">
-        <div>
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <h2 className="font-serif text-[26px] font-semibold tracking-tight text-[#1F1610]">
             Task Board
           </h2>
@@ -103,7 +103,7 @@ export function KanbanBoard({
         </div>
         <button
           onClick={() => onAddTask?.(columns[0]?.id ?? "")}
-          className="tactile-button inline-flex items-center gap-1.5 rounded-full bg-[#2A211C] px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-white shadow-[0_2px_8px_rgba(42,33,28,0.12)] hover:bg-[#3D322B] hover:shadow-[0_4px_12px_rgba(42,33,28,0.18)]"
+          className="tactile-button inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-[#2A211C] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-white shadow-[0_2px_8px_rgba(42,33,28,0.12)] hover:bg-[#3D322B] hover:shadow-[0_4px_12px_rgba(42,33,28,0.18)] sm:w-auto sm:py-2"
         >
           <Plus className="size-3.5" strokeWidth={2} />
           Add Task
@@ -112,14 +112,14 @@ export function KanbanBoard({
 
       {/* Board */}
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           {columns.map((column) => {
             const config = columnConfig[column.title.toLowerCase()] ?? columnConfig["to do"];
 
             return (
               <div
                 key={column.id}
-                className="flex flex-col rounded-2xl p-4 border"
+                className="flex min-h-[360px] flex-col rounded-2xl border p-4"
                 style={{
                   background: config.gradient,
                   borderColor: "rgba(216,138,91,0.06)",
@@ -148,7 +148,7 @@ export function KanbanBoard({
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className={`space-y-2.5 flex-1 min-h-[240px] max-h-[560px] overflow-y-auto transition-all rounded-xl p-1.5 ${
+                      className={`space-y-2.5 flex-1 min-h-[220px] max-h-[420px] overflow-y-auto rounded-xl p-1.5 transition-all lg:max-h-[560px] ${
                         snapshot.isDraggingOver
                           ? "bg-white/50 ring-1 ring-[#D88A5B]/12"
                           : ""
@@ -159,7 +159,7 @@ export function KanbanBoard({
                       }`}
                     >
                       {column.tasks.length === 0 && !snapshot.isDraggingOver ? (
-                        <div className="flex flex-col items-center gap-7 pt-[80px] pb-6 text-center">
+                        <div className="flex flex-col items-center gap-5 py-8 text-center lg:gap-7 lg:pb-6 lg:pt-[80px]">
                           {/* Icon with atmospheric warm glow — primary visual anchor */}
                           <div className="relative flex items-center justify-center group">
                             <div
@@ -173,7 +173,7 @@ export function KanbanBoard({
                             <img
                               src={config.icon}
                               alt=""
-                              className="size-[152px] object-contain drop-shadow-[0_12px_32px_rgba(42,33,28,0.12)] transition-all duration-[0.35s] ease-out group-hover:-translate-y-1"
+                              className="size-28 object-contain drop-shadow-[0_12px_32px_rgba(42,33,28,0.12)] transition-all duration-[0.35s] ease-out group-hover:-translate-y-1 sm:size-[132px] lg:size-[152px]"
                               draggable={false}
                               style={{
                                 animation: "column-icon-fade-in 0.6s ease-out",

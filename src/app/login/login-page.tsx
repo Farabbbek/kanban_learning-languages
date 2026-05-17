@@ -68,7 +68,7 @@ export default function LoginPage() {
   );
 
   return (
-    <div className="flex min-h-screen w-full overflow-hidden bg-[#f8f3ee]">
+    <div className="flex min-h-svh w-full overflow-hidden bg-[#f8f3ee]">
       {/* =================================================== */}
       {/* LEFT PANEL — Cinematic Artwork (48%)               */}
       {/* =================================================== */}
@@ -197,29 +197,29 @@ export default function LoginPage() {
       {/* =================================================== */}
       {/* RIGHT PANEL — Login Content (52%)                  */}
       {/* =================================================== */}
-      <div className="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#fcf8f2] via-[#f8f3ee] to-[#f5ede4] md:w-[52%]">
+      <div className="relative flex min-h-svh w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#fcf8f2] via-[#f8f3ee] to-[#f5ede4] md:w-[52%]">
         {/* SOFT EDGE TRANSITION — blends left panel seamlessly */}
         <div className="pointer-events-none absolute inset-y-0 -left-24 w-32 bg-gradient-to-r from-[#f8f3ee]/70 to-transparent z-10" />
 
         {/* Warm radial glow behind content */}
-        <div className="absolute left-1/2 top-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,248,240,0.6)_0%,rgba(197,107,71,0.035)_38%,transparent_65%)]" />
+        <div className="absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,248,240,0.6)_0%,rgba(197,107,71,0.035)_38%,transparent_65%)] sm:h-[800px] sm:w-[800px]" />
 
         {/* Abstract orbit lines */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 140, repeat: Infinity, ease: "linear" }}
-            className="absolute left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#e5dcd1]/20"
+            className="absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#e5dcd1]/20 sm:h-[700px] sm:w-[700px]"
           />
           <motion.div
             animate={{ rotate: -360 }}
             transition={{ duration: 180, repeat: Infinity, ease: "linear" }}
-            className="absolute left-1/2 top-1/2 h-[1000px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[#e5dcd1]/15"
+            className="absolute left-1/2 top-1/2 h-[760px] w-[760px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[#e5dcd1]/15 sm:h-[1000px] sm:w-[1000px]"
           />
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 220, repeat: Infinity, ease: "linear" }}
-            className="absolute left-1/2 top-1/2 h-[1300px] w-[1300px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#e5dcd1]/8"
+            className="absolute left-1/2 top-1/2 h-[980px] w-[980px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#e5dcd1]/8 sm:h-[1300px] sm:w-[1300px]"
           />
         </div>
 
@@ -260,10 +260,18 @@ export default function LoginPage() {
           <span className="font-serif text-2xl text-[#c56b47]/25">✦</span>
         </div>
 
+        <Link
+          href="/"
+          className="absolute left-5 top-5 z-20 inline-flex items-center gap-1.5 tracking-[-0.02em] transition-opacity hover:opacity-80 md:hidden"
+        >
+          <span className="text-base font-semibold text-[#17120f]">LinguaBoard</span>
+          <span className="text-xl leading-none text-[#c96b43]">*</span>
+        </Link>
+
         {/* ============================================= */}
         {/* CONTENT — centered login form               */}
         {/* ============================================= */}
-        <div className="relative z-10 mx-auto w-full max-w-[540px] px-10 py-20 md:py-0">
+        <div className="relative z-10 mx-auto w-full max-w-[540px] px-5 py-24 sm:px-8 md:px-10 md:py-0">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -271,12 +279,12 @@ export default function LoginPage() {
             className="flex flex-col items-center text-center"
           >
             {/* Top label */}
-            <p className="mb-10 text-[10px] font-semibold uppercase tracking-[0.4em] text-[#8d8175]/45">
+            <p className="mb-7 text-[10px] font-semibold uppercase tracking-[0.32em] text-[#8d8175]/45 sm:mb-10 sm:tracking-[0.4em]">
               Welcome back
             </p>
 
             {/* Main heading */}
-            <h1 className="font-serif text-5xl leading-[1.15] tracking-tight text-[#111] sm:text-6xl lg:text-7xl">
+            <h1 className="font-serif text-[42px] leading-[1.08] tracking-tight text-[#111] sm:text-6xl lg:text-7xl">
               Log in to your
               <br />
               <span className="font-serif text-[#c56b47] font-light italic drop-shadow-[0_1px_2px_rgba(197,107,71,0.08)]">
@@ -285,12 +293,12 @@ export default function LoginPage() {
             </h1>
 
             {/* Description */}
-            <p className="mx-auto mt-7 max-w-[420px] text-base font-light leading-relaxed text-[#8d8175]">
+            <p className="mx-auto mt-5 max-w-[420px] text-[15px] font-light leading-relaxed text-[#8d8175] sm:mt-7 sm:text-base">
               Access your learning system, continue your journey and stay disciplined.
             </p>
 
             {/* Google button with warm glow behind */}
-            <div className="relative mt-12 w-full">
+            <div className="relative mt-9 w-full sm:mt-12">
               {/* Subtle glow behind button */}
               <div className="absolute left-1/2 top-1/2 h-28 w-3/4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(197,107,71,0.06)_0%,transparent_60%)] blur-[20px]" />
 
@@ -303,7 +311,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={handleGoogleSignIn}
                     disabled={isLoading}
-                    className="group flex h-20 w-full items-center justify-center gap-4 rounded-2xl border border-[#e5dcd1]/60 bg-white/55 px-8 shadow-[0_12px_40px_rgba(160,120,90,0.07),0_4px_12px_rgba(160,120,90,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition-all duration-400 hover:border-[#c56b47]/30 hover:bg-white/75 hover:shadow-[0_20px_60px_rgba(160,120,90,0.12),0_0_50px_rgba(197,107,71,0.08),inset_0_1px_0_rgba(255,255,255,1)] disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="group flex h-16 w-full items-center justify-center gap-3 rounded-2xl border border-[#e5dcd1]/60 bg-white/55 px-5 shadow-[0_12px_40px_rgba(160,120,90,0.07),0_4px_12px_rgba(160,120,90,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition-all duration-300 hover:border-[#c56b47]/30 hover:bg-white/75 hover:shadow-[0_20px_60px_rgba(160,120,90,0.12),0_0_50px_rgba(197,107,71,0.08),inset_0_1px_0_rgba(255,255,255,1)] disabled:cursor-not-allowed disabled:opacity-60 sm:h-20 sm:gap-4 sm:px-8"
                   >
                     <svg className="size-6 shrink-0" viewBox="0 0 24 24">
                       <path
@@ -323,7 +331,7 @@ export default function LoginPage() {
                         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                       />
                     </svg>
-                    <span className="text-base font-semibold text-[#333] transition-colors group-hover:text-[#111]">
+                    <span className="text-sm font-semibold text-[#333] transition-colors group-hover:text-[#111] sm:text-base">
                       {isLoading ? "Redirecting…" : "Continue with Google"}
                     </span>
                   </button>
@@ -340,16 +348,16 @@ export default function LoginPage() {
             </div>
 
             {/* Divider */}
-            <div className="mt-10 flex w-full items-center gap-5">
+            <div className="mt-8 flex w-full items-center gap-3 sm:mt-10 sm:gap-5">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e5dcd1]/40 to-transparent" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[#8d8175]/35">
+              <span className="text-center text-[9px] font-semibold uppercase tracking-[0.22em] text-[#8d8175]/35 sm:text-[10px] sm:tracking-[0.35em]">
                 More options soon
               </span>
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#e5dcd1]/40 to-transparent" />
             </div>
 
             {/* Bottom features */}
-            <div className="mt-12 grid w-full grid-cols-3 gap-6">
+            <div className="mt-8 grid w-full grid-cols-1 gap-3 sm:mt-12 sm:grid-cols-3 sm:gap-6">
               {[
                 {
                   icon: (
@@ -381,7 +389,7 @@ export default function LoginPage() {
               ].map((feature) => (
                 <div
                   key={feature.title}
-                  className="flex flex-col items-center gap-3 rounded-xl px-2 py-5 text-center transition-colors hover:bg-white/30"
+                  className="flex flex-row items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-white/30 sm:flex-col sm:px-2 sm:py-5 sm:text-center"
                 >
                   <span className="flex size-9 items-center justify-center rounded-full bg-[#c56b47]/8 text-[#c56b47]">
                     {feature.icon}
