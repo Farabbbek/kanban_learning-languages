@@ -158,7 +158,12 @@ function MenuContent<T>({
       />
       <div className="pointer-events-none absolute -top-8 left-1/4 size-32 rounded-full bg-[#D88A5B]/8 blur-2xl" />
 
-      <div className="relative z-10 px-1.5 py-2 max-h-[280px] overflow-y-auto overscroll-contain">
+      <div
+        className="relative z-10 overflow-y-auto overscroll-contain px-1.5 py-2"
+        style={{
+          maxHeight: "min(280px, var(--luxury-select-menu-max-height, 280px))",
+        }}
+      >
         {options.map((option) => {
           const isSelected = option.value === value;
           return (
@@ -216,25 +221,42 @@ function useMenuPosition(
 
   useEffect(() => {
     if (open && triggerRef.current) {
+      const viewportPadding = 12;
       const rect = triggerRef.current.getBoundingClientRect();
-      const menuWidth = Math.max(rect.width, 200);
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
+      const maxWidth = Math.max(200, window.innerWidth - viewportPadding * 2);
+      const menuWidth = Math.min(Math.max(rect.width, 200), maxWidth);
+      const left = Math.min(
+        Math.max(rect.left, viewportPadding),
+        window.innerWidth - menuWidth - viewportPadding
+      );
+      const spaceBelow = window.innerHeight - rect.bottom - viewportPadding;
+      const spaceAbove = rect.top - viewportPadding;
       const estimatedHeight = Math.min(itemCount * 48 + 16, 320);
+      const shouldOpenAbove = above || (spaceAbove > spaceBelow && spaceBelow < estimatedHeight);
+      const availableHeight = Math.max(
+        120,
+        shouldOpenAbove ? spaceAbove : spaceBelow
+      );
+      const maxHeight = Math.min(estimatedHeight, availableHeight);
+      const sharedStyle = {
+        position: "fixed" as const,
+        left,
+        width: menuWidth,
+        maxHeight,
+        "--luxury-select-menu-max-height": `${maxHeight}px`,
+      } as React.CSSProperties;
 
-      if (above || (spaceAbove > spaceBelow && spaceBelow < estimatedHeight)) {
+      if (shouldOpenAbove) {
         setMenuStyle({
-          position: "fixed" as const,
+          ...sharedStyle,
           bottom: window.innerHeight - rect.top + 6,
-          left: rect.left,
-          width: menuWidth,
+          transformOrigin: "bottom",
         });
       } else {
         setMenuStyle({
-          position: "fixed" as const,
+          ...sharedStyle,
           top: rect.bottom + 6,
-          left: rect.left,
-          width: menuWidth,
+          transformOrigin: "top",
         });
       }
     }
@@ -543,8 +565,17 @@ export function LuxurySearchableSelect<T = string>({
               setOpen(false);
               inputRef.current?.blur();
             }
-            if (e.key === "Enter" && filtered.length === 1) {
-              handleSelect(filtered[0].value);
+            if (e.key === "Enter") {
+              e.preventDefault();
+              if (filtered.length === 1) {
+                handleSelect(filtered[0].value);
+                return;
+              }
+              if (search.trim()) {
+                onChange(search.trim() as unknown as T);
+                setOpen(false);
+                onSubmit?.();
+              }
             }
           }}
           placeholder={placeholder}

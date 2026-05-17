@@ -28,7 +28,7 @@ import {
   PenTool,
   User,
 } from "lucide-react";
-import { Sidebar } from "@/components/dashboard/sidebar";
+
 import { cn } from "@/lib/utils";
 import { GoalCard, Goal } from "@/components/dashboard/goal-card";
 
@@ -928,14 +928,9 @@ export default function GoalsPage() {
       <div className="pointer-events-none fixed bottom-[8%] left-[3%] size-[600px] rounded-full bg-gradient-to-tr from-[#C9A96E]/5 via-[#D88A5B]/3 to-transparent blur-[140px]" />
       <div className="pointer-events-none fixed left-[40%] top-[50%] size-[500px] rounded-full bg-[#FFF5E6]/15 blur-[120px]" />
 
-      <FloatingDust />
-
-      <Sidebar />
-
       {/* Confetti overlay */}
       <AnimatePresence>{showConfetti && <ConfettiBurst />}</AnimatePresence>
 
-      <main className="ml-[220px]">
         <div className="relative z-10 mx-auto max-w-5xl px-6 pt-12 pb-24">
           {/* Header */}
           <div className="mb-10 flex items-center justify-between">
@@ -1061,7 +1056,6 @@ export default function GoalsPage() {
           {/* Bottom spacing */}
           <div className="h-20" />
         </div>
-      </main>
     </div>
   );
 }

@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           const res = await fetch("/api/study/streak");
           const data = await res.json();
-          if (data?.streak) setStreak(data.streak);
+          if (typeof data?.streak === "number") setStreak(data.streak);
         } catch {
           // silent
         }

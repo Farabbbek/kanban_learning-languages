@@ -18,7 +18,7 @@ import {
   BookMarked,
   Layers,
 } from "lucide-react";
-import { Sidebar } from "@/components/dashboard/sidebar";
+
 import { cn } from "@/lib/utils";
 
 /* ──────────────────────────────────────────────
@@ -445,9 +445,7 @@ function AmbientNoise() {
 export default function ProgressPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F4EFE8" }}>
-      <Sidebar />
       <AmbientNoise />
-      <main className="ml-[220px]">
         <div className="relative min-h-screen">
           {/* Ambient glows */}
           <div className="pointer-events-none fixed right-[5%] top-[4%] size-[550px] rounded-full bg-gradient-to-br from-[#D88A5B]/5 via-[#C9A96E]/3 to-transparent blur-[160px]" />
@@ -711,7 +709,6 @@ export default function ProgressPage() {
             </motion.div>
           </div>
         </div>
-      </main>
     </div>
   );
 }

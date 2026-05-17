@@ -2,6 +2,35 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { DashboardClient } from "./dashboard-client";
 
+interface TaskColumnRow {
+  id: string;
+  title: string;
+  color: string;
+}
+
+interface TaskBoardRow {
+  id: string;
+  title: string;
+  color: string;
+  icon: string;
+  task_columns?: TaskColumnRow[] | null;
+}
+
+interface TaskRow {
+  id: string;
+  title: string;
+  description: string | null;
+  tags: string[] | null;
+  priority: number | null;
+  estimated_minutes: number | null;
+  column_id: string;
+  position: number;
+}
+
+interface StudySessionRow {
+  duration_minutes: number | null;
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -13,19 +42,30 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  // Fetch profile (only what we need)
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("display_name, daily_goal_minutes")
-    .eq("id", user.id)
-    .single();
+  const today = new Date().toISOString().split("T")[0];
 
-  // Fetch task boards with columns
-  let { data: taskBoards } = await supabase
-    .from("task_boards")
-    .select("*, task_columns(*)")
-    .eq("user_id", user.id)
-    .order("position", { ascending: true });
+  const [profileResult, taskBoardsResult, todaySessionsResult] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("display_name, daily_goal_minutes")
+      .eq("id", user.id)
+      .single(),
+    supabase
+      .from("task_boards")
+      .select("*, task_columns(*)")
+      .eq("user_id", user.id)
+      .order("position", { ascending: true }),
+    supabase
+      .from("study_sessions")
+      .select("duration_minutes")
+      .eq("user_id", user.id)
+      .eq("session_date", today),
+  ]);
+
+  const profile = profileResult.data;
+  const taskBoardRows = taskBoardsResult.data;
+  const todaySessions = todaySessionsResult.data;
+  let taskBoards = taskBoardRows as TaskBoardRow[] | null;
 
   // Auto-create default board if none exists
   if (!taskBoards || taskBoards.length === 0) {
@@ -61,27 +101,27 @@ export default async function DashboardPage() {
         .eq("id", newBoard.id)
         .single();
 
-      taskBoards = boardWithColumns ? [boardWithColumns] : [];
+      taskBoards = boardWithColumns ? [boardWithColumns as TaskBoardRow] : [];
     }
   }
 
   // Fetch tasks for the first board
-  let tasks: any[] = [];
+  let tasks: TaskRow[] = [];
   if (taskBoards && taskBoards.length > 0) {
     const { data: fetchedTasks } = await supabase
       .from("tasks")
       .select("*")
       .in(
         "column_id",
-        taskBoards[0].task_columns?.map((c: any) => c.id) ?? []
+        taskBoards[0].task_columns?.map((c) => c.id) ?? []
       )
       .eq("user_id", user.id)
       .order("position", { ascending: true });
-    tasks = fetchedTasks ?? [];
+    tasks = (fetchedTasks as TaskRow[] | null) ?? [];
   }
 
   // Serialize
-  const serializedTasks = tasks.map((t: any) => ({
+  const serializedTasks = tasks.map((t) => ({
     id: t.id,
     title: t.title,
     description: t.description ?? undefined,
@@ -92,12 +132,12 @@ export default async function DashboardPage() {
     position: t.position,
   }));
 
-  const serializedBoards = (taskBoards ?? []).map((b: any) => ({
+  const serializedBoards = (taskBoards ?? []).map((b) => ({
     id: b.id,
     title: b.title,
     color: b.color,
     icon: b.icon,
-    columns: (b.task_columns ?? []).map((c: any) => ({
+    columns: (b.task_columns ?? []).map((c) => ({
       id: c.id,
       title: c.title,
       color: c.color,
@@ -108,43 +148,11 @@ export default async function DashboardPage() {
   const displayName = profile?.display_name ?? user.email?.split("@")[0] ?? "Learner";
   const dailyGoal = profile?.daily_goal_minutes ?? 20;
 
-  // Get today's study minutes (compact)
-  const today = new Date().toISOString().split("T")[0];
-  const { data: todaySessions } = await supabase
-    .from("study_sessions")
-    .select("duration_minutes")
-    .eq("user_id", user.id)
-    .eq("session_date", today);
-  const todayMinutes = todaySessions?.reduce((sum: number, s: any) => sum + (s.duration_minutes ?? 0), 0) ?? 0;
-
-  // Calculate initial streak from completed sessions
-  const { data: streakSessions } = await supabase
-    .from("study_sessions")
-    .select("session_date")
-    .eq("user_id", user.id)
-    .eq("completed", true)
-    .order("session_date", { ascending: false });
-
-  let initialStreak = 0;
-  if (streakSessions && streakSessions.length > 0) {
-    const uniqueDates: string[] = [
-      ...new Set(streakSessions.map((s: { session_date: string }) => s.session_date)),
-    ].sort((a, b) => b.localeCompare(a));
-    const now = new Date();
-    const todayStr = now.toISOString().split("T")[0];
-    const yesterdayDate = new Date(now.getTime() - 86400000);
-    const yesterdayStr = yesterdayDate.toISOString().split("T")[0];
-    if (uniqueDates[0] === todayStr || uniqueDates[0] === yesterdayStr) {
-      const checkDate = new Date(uniqueDates[0]);
-      for (const dateStr of uniqueDates) {
-        const expected = checkDate.toISOString().split("T")[0];
-        if (dateStr === expected) {
-          initialStreak++;
-          checkDate.setDate(checkDate.getDate() - 1);
-        } else break;
-      }
-    }
-  }
+  const todayMinutes =
+    (todaySessions as StudySessionRow[] | null)?.reduce(
+      (sum, s) => sum + (s.duration_minutes ?? 0),
+      0
+    ) ?? 0;
 
   return (
     <DashboardClient
@@ -152,7 +160,6 @@ export default async function DashboardPage() {
       todayMinutes={todayMinutes}
       dailyGoal={dailyGoal}
       boards={serializedBoards}
-      initialStreak={initialStreak}
     />
   );
 }

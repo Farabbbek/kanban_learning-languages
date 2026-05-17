@@ -33,7 +33,6 @@ import {
 } from "lucide-react";
 import { LuxurySelect, LuxurySearchableSelect } from "@/components/ui/luxury-select";
 import { applySm2 } from "@/lib/sm2";
-import { Sidebar } from "@/components/dashboard/sidebar";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast, Toaster } from "react-hot-toast";
@@ -1259,7 +1258,7 @@ function QuizPlayer({
   const isTranslation = q.sourceWord && q.sourceLanguage && q.targetLanguage;
 
   return (
-    <div className="mx-auto max-w-[580px]">
+    <div className="notranslate mx-auto max-w-[580px]" translate="no">
       {/* ─── Progress bar + Score + Timer ─── */}
       <div className="mb-8 flex items-center gap-4">
         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[rgba(210,190,170,0.2)]">
@@ -1297,7 +1296,7 @@ function QuizPlayer({
             /* ─── TRANSLATION QUIZ LAYOUT ─── */
             <div className="text-center">
               {/* Language direction label */}
-              <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-[rgba(232,218,200,0.25)] border border-[rgba(210,190,170,0.15)] px-3.5 py-1 text-[11px] font-semibold tracking-[0.08em] text-[#6f6257]/70">
+              <div className="notranslate mb-2 inline-flex items-center gap-2 rounded-full bg-[rgba(232,218,200,0.25)] border border-[rgba(210,190,170,0.15)] px-3.5 py-1 text-[11px] font-semibold tracking-[0.08em] text-[#6f6257]/70" translate="no">
                 <span>{q.sourceLanguage}</span>
                 <ArrowRight className="size-3" strokeWidth={2} />
                 <span>{q.targetLanguage}</span>
@@ -1312,7 +1311,8 @@ function QuizPlayer({
               <motion.h2
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="font-serif text-[56px] font-bold leading-[0.95] tracking-tight text-[#241811]"
+                className="notranslate font-serif text-[56px] font-bold leading-[0.95] tracking-tight text-[#241811]"
+                translate="no"
               >
                 {q.sourceWord}
               </motion.h2>
@@ -1365,10 +1365,13 @@ function QuizPlayer({
                   </span>
 
                   {/* Option text */}
-                  <span className={cn("flex-1",
+                  <span
+                    className={cn("notranslate flex-1",
                     isAnswered && isCorrect ? "font-semibold" : "",
                     isAnswered && isSelected && !isCorrect ? "" : ""
-                  )}>
+                    )}
+                    translate="no"
+                  >
                     {option}
                   </span>
 
@@ -1836,7 +1839,7 @@ export default function FlashcardsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F7F1E8" }}>
+    <>
       <Toaster
         position="top-center"
         toastOptions={{
@@ -1844,19 +1847,17 @@ export default function FlashcardsPage() {
           style: { background: "transparent", boxShadow: "none", padding: 0 },
         }}
       />
-      <Sidebar />
-      <main className="ml-[220px]">
-        <div className="relative min-h-screen">
-          <div className="cinematic-page fixed inset-0 ml-[220px]" />
-          <div className="workspace-fog fixed inset-0 ml-[220px] pointer-events-none" />
+      <div className="relative min-h-screen">
+        <div className="cinematic-page fixed inset-0" />
+        <div className="workspace-fog fixed inset-0 pointer-events-none" />
 
-          <div className="pointer-events-none fixed right-[8%] top-[15%] size-[700px] rounded-full bg-gradient-to-br from-[#D88A5B]/6 via-[#C9A96E]/4 to-transparent blur-[180px]" />
-          <div className="pointer-events-none fixed bottom-[8%] left-[3%] size-[600px] rounded-full bg-gradient-to-tr from-[#C9A96E]/5 via-[#D88A5B]/3 to-transparent blur-[140px]" />
-          <div className="pointer-events-none fixed left-[40%] top-[50%] size-[500px] rounded-full bg-[#FFF5E6]/15 blur-[120px]" />
+        <div className="pointer-events-none fixed right-[8%] top-[15%] size-[700px] rounded-full bg-gradient-to-br from-[#D88A5B]/6 via-[#C9A96E]/4 to-transparent blur-[180px]" />
+        <div className="pointer-events-none fixed bottom-[8%] left-[3%] size-[600px] rounded-full bg-gradient-to-tr from-[#C9A96E]/5 via-[#D88A5B]/3 to-transparent blur-[140px]" />
+        <div className="pointer-events-none fixed left-[40%] top-[50%] size-[500px] rounded-full bg-[#FFF5E6]/15 blur-[120px]" />
 
-          <FloatingDust />
+        <FloatingDust />
 
-          <div className="relative z-10 mx-auto max-w-5xl px-6 pt-12 pb-24">
+        <div className="relative z-10 mx-auto max-w-5xl px-6 pt-12 pb-24">
             {/* Header */}
             <div className="mb-10 flex items-center justify-between">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8d8175]/45">Flashcards Studio</p>
@@ -1930,9 +1931,8 @@ export default function FlashcardsPage() {
                 <QuizForm key="quiz-form" onGenerate={handleGenerateQuiz} isGenerating={isGenerating} />
               )}
             </AnimatePresence>
-          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

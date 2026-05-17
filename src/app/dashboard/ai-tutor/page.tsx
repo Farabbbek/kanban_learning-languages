@@ -14,7 +14,7 @@ import {
   Brain,
   ChevronRight,
 } from "lucide-react";
-import { Sidebar } from "@/components/dashboard/sidebar";
+
 import { cn } from "@/lib/utils";
 
 /* ──────────────────────────────────────────────
@@ -508,9 +508,7 @@ function WaitlistSection() {
 export default function AiTutorPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F4EFE8" }}>
-      <Sidebar />
       <AmbientNoise />
-      <main className="ml-[220px]">
         <div className="relative min-h-screen">
           {/* Cinematic ambient fog layers */}
           <div className="pointer-events-none fixed right-[5%] top-[3%] size-[700px] rounded-full bg-gradient-to-br from-[#D88A5B]/6 via-[#C9A96E]/4 to-transparent blur-[180px]" />
@@ -693,7 +691,6 @@ export default function AiTutorPage() {
             </motion.div>
           </div>
         </div>
-      </main>
     </div>
   );
 }

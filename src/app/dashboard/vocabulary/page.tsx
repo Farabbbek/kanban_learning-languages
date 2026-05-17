@@ -24,7 +24,6 @@ import {
   Play,
   Zap,
 } from "lucide-react";
-import { Sidebar } from "@/components/dashboard/sidebar";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { usePremiumTts } from "@/hooks/use-premium-tts";
@@ -435,7 +434,14 @@ function AiGeneratorPanel({
   const [level, setLevel] = useState("B1");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const topicRef = useRef<HTMLTextAreaElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
   const [focusField, setFocusField] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (showSuggestions) {
+      suggestionsRef.current?.scrollTo({ top: 0 });
+    }
+  }, [showSuggestions]);
 
   const handleSubmit = useCallback(() => {
     if (!topic.trim() || isGenerating) return;
@@ -457,7 +463,7 @@ function AiGeneratorPanel({
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-      className="relative mb-12 overflow-hidden rounded-[32px] border border-[rgba(210,190,170,0.18)] transition-all duration-500"
+      className="relative z-20 mb-12 overflow-visible rounded-[32px] border border-[rgba(210,190,170,0.18)] transition-all duration-500"
       style={{
         background: "linear-gradient(165deg, rgba(255,250,245,0.96), rgba(250,244,235,0.92))",
         backdropFilter: "blur(18px)",
@@ -541,13 +547,14 @@ function AiGeneratorPanel({
 
               <AnimatePresence>
                 {showSuggestions && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -8, scaleY: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scaleY: 1 }}
-                    exit={{ opacity: 0, y: -8, scaleY: 0.95 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute left-0 right-0 z-20 mt-1.5 max-h-48 overflow-y-auto rounded-[16px] border border-[rgba(210,190,170,0.22)] bg-white/98 backdrop-blur-xl shadow-[0_16px_48px_rgba(42,33,28,0.16)]"
-                  >
+	                  <motion.div
+	                    ref={suggestionsRef}
+	                    initial={{ opacity: 0, y: -8, scaleY: 0.95 }}
+	                    animate={{ opacity: 1, y: 0, scaleY: 1 }}
+	                    exit={{ opacity: 0, y: -8, scaleY: 0.95 }}
+	                    transition={{ duration: 0.2 }}
+	                    className="absolute left-0 right-0 z-[80] mt-1.5 max-h-[232px] overflow-y-auto overscroll-contain rounded-[16px] border border-[rgba(210,190,170,0.22)] bg-white/98 backdrop-blur-xl shadow-[0_22px_64px_rgba(42,33,28,0.18)]"
+	                  >
                     {SUGGESTED_TOPICS.map((suggestion) => (
                       <motion.button
                         key={suggestion}
@@ -1510,41 +1517,38 @@ export default function VocabularyPage() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: COLORS.warmIvory }}>
-      <Sidebar />
+    <>
+      <div className="relative min-h-screen">
+        {/* Cinematic background layers - now inherited from layout */}
+        <div className="cinematic-page fixed inset-0" />
+        <div className="workspace-fog fixed inset-0 pointer-events-none" />
 
-      <main className="ml-[220px]">
-        <div className="relative min-h-screen">
-          {/* Cinematic background layers */}
-          <div className="cinematic-page fixed inset-0 ml-[220px]" />
-          <div className="workspace-fog fixed inset-0 ml-[220px] pointer-events-none" />
+        {/* Warm radial glows */}
+        <div className="pointer-events-none fixed right-[8%] top-[15%] size-[700px] rounded-full bg-gradient-to-br from-[#D88A5B]/6 via-[#C9A96E]/4 to-transparent blur-[180px]" />
+        <div className="pointer-events-none fixed bottom-[8%] left-[3%] size-[600px] rounded-full bg-gradient-to-tr from-[#C9A96E]/5 via-[#D88A5B]/3 to-transparent blur-[140px]" />
+        <div className="pointer-events-none fixed left-[40%] top-[50%] size-[500px] rounded-full bg-[#FFF5E6]/15 blur-[120px]" />
+        <div className="pointer-events-none fixed left-[10%] top-[20%] size-[400px] rounded-full bg-[#8B9D83]/4 blur-[100px]" />
 
-          {/* Warm radial glows */}
-          <div className="pointer-events-none fixed right-[8%] top-[15%] size-[700px] rounded-full bg-gradient-to-br from-[#D88A5B]/6 via-[#C9A96E]/4 to-transparent blur-[180px]" />
-          <div className="pointer-events-none fixed bottom-[8%] left-[3%] size-[600px] rounded-full bg-gradient-to-tr from-[#C9A96E]/5 via-[#D88A5B]/3 to-transparent blur-[140px]" />
-          <div className="pointer-events-none fixed left-[40%] top-[50%] size-[500px] rounded-full bg-[#FFF5E6]/15 blur-[120px]" />
-          <div className="pointer-events-none fixed left-[10%] top-[20%] size-[400px] rounded-full bg-[#8B9D83]/4 blur-[100px]" />
+        {/* Watercolor paper texture overlay */}
+        <div
+          className="pointer-events-none fixed inset-0 opacity-[0.020] mix-blend-multiply"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='watercolor'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23watercolor)'/%3E%3C/svg%3E")`,
+          }}
+        />
 
-          {/* Watercolor paper texture overlay */}
-          <div
-            className="pointer-events-none fixed inset-0 ml-[220px] opacity-[0.020] mix-blend-multiply"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='watercolor'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23watercolor)'/%3E%3C/svg%3E")`,
-            }}
-          />
+        {/* Subtle renaissance pattern overlay */}
+        <div
+          className="pointer-events-none fixed inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D88A5B' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        />
 
-          {/* Subtle renaissance pattern overlay */}
-          <div
-            className="pointer-events-none fixed inset-0 ml-[220px] opacity-[0.04]"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D88A5B' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            }}
-          />
+        {/* Floating dust motes */}
+        <FloatingDust />
 
-          {/* Floating dust motes */}
-          <FloatingDust />
-
-          <div className="relative z-10 mx-auto max-w-6xl px-6 pt-12 pb-24">
+        <div className="relative z-10 mx-auto max-w-6xl px-6 pt-12 pb-24">
             {/* Header bar - no breadcrumb, just breathing room */}
             <div className="mb-10 flex items-center justify-between">
               <div>
@@ -1704,9 +1708,8 @@ export default function VocabularyPage() {
 
               <VocabGrid words={allWords} tab={activeTab} onUpdateStatus={handleUpdateStatus} onPronounce={handlePronounce} onDelete={handleDelete} />
             </div>
-          </div>
         </div>
-      </main>
+      </div>
 
       {/* Clear Learning Modal */}
       <ClearLearningModal
@@ -1715,6 +1718,6 @@ export default function VocabularyPage() {
         onConfirm={handleClearLearning}
         wordCount={learningCount}
       />
-    </div>
+    </>
   );
 }

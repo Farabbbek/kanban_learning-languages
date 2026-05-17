@@ -22,6 +22,34 @@ export function useStudyTracker() {
   const tickIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const minutesRef = useRef(0);
 
+  const startTicker = useCallback(() => {
+    if (tickIntervalRef.current) return;
+
+    tickIntervalRef.current = setInterval(async () => {
+      if (!sessionIdRef.current) return;
+      minutesRef.current += 1;
+
+      try {
+        await fetch(`/api/study/${sessionIdRef.current}/tick`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ duration_minutes: minutesRef.current }),
+        });
+
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            sessionId: sessionIdRef.current,
+            date: new Date().toISOString().split("T")[0],
+            minutes: minutesRef.current,
+          } satisfies SessionState)
+        );
+      } catch {
+        // silent fail
+      }
+    }, 60_000);
+  }, []);
+
   const startSession = useCallback(async () => {
     try {
       const res = await fetch("/api/study/start", { method: "POST" });
@@ -40,24 +68,11 @@ export function useStudyTracker() {
         } satisfies SessionState)
       );
 
-      // Start ticker — every 60 seconds
-      tickIntervalRef.current = setInterval(async () => {
-        if (!sessionIdRef.current) return;
-        minutesRef.current += 1;
-        try {
-          await fetch(`/api/study/${sessionIdRef.current}/tick`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ duration_minutes: minutesRef.current }),
-          });
-        } catch {
-          // silent fail
-        }
-      }, 60_000);
+      startTicker();
     } catch {
       // silent fail
     }
-  }, []);
+  }, [startTicker]);
 
   const endSession = useCallback(async () => {
     if (tickIntervalRef.current) {
@@ -83,6 +98,7 @@ export function useStudyTracker() {
     // Check localStorage for existing session
     const stored = localStorage.getItem(STORAGE_KEY);
     const today = new Date().toISOString().split("T")[0];
+    let resumedSession = false;
 
     if (stored) {
       try {
@@ -92,35 +108,22 @@ export function useStudyTracker() {
           sessionIdRef.current = parsed.sessionId;
           minutesRef.current = parsed.minutes;
 
-          // Resume ticker
-          tickIntervalRef.current = setInterval(async () => {
-            if (!sessionIdRef.current) return;
-            minutesRef.current += 1;
-            try {
-              await fetch(`/api/study/${sessionIdRef.current}/tick`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ duration_minutes: minutesRef.current }),
-              });
-            } catch {
-              // silent fail
-            }
-          }, 60_000);
-
-          return; // Don't start a new session
+          startTicker();
+          resumedSession = true;
         }
       } catch {
         // corrupted storage, start fresh
       }
     }
 
-    // Start new session
-    startSession();
+    if (!resumedSession) {
+      startSession();
+    }
 
     return () => {
       endSession();
     };
-  }, [startSession, endSession]);
+  }, [startSession, endSession, startTicker]);
 
   // End session on tab close
   useEffect(() => {

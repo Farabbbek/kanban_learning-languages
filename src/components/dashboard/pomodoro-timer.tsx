@@ -258,6 +258,9 @@ export function PomodoroTimer({ isOpen, onClose }: PomodoroTimerProps) {
 
   const handleModeChange = useCallback(
     (newMode: "work" | "break") => {
+      if (mode === "work" && newMode === "break" && remainingSeconds > 0) {
+        return;
+      }
       setIsRunning(false);
       startedAtRef.current = null;
       if (intervalRef.current) {
@@ -275,7 +278,7 @@ export function PomodoroTimer({ isOpen, onClose }: PomodoroTimerProps) {
         startedAt: null,
       });
     },
-    [workMinutes, breakMinutes, persist]
+    [mode, remainingSeconds, workMinutes, breakMinutes, persist]
   );
 
   const handleWorkChange = useCallback(
@@ -314,6 +317,7 @@ export function PomodoroTimer({ isOpen, onClose }: PomodoroTimerProps) {
     totalSeconds > 0 ? 1 - remainingSeconds / totalSeconds : 0;
   const circumference = 2 * Math.PI * 72;
   const strokeDashoffset = circumference * (1 - progress);
+  const isBreakLocked = mode === "work" && remainingSeconds > 0;
 
   if (!isOpen && !closing) return null;
 
@@ -380,10 +384,14 @@ export function PomodoroTimer({ isOpen, onClose }: PomodoroTimerProps) {
               </button>
               <button
                 onClick={() => handleModeChange("break")}
+                disabled={isBreakLocked}
+                title={isBreakLocked ? "Break unlocks after focus time ends" : "Switch to break"}
                 className={`flex-1 rounded-lg py-2 text-[11px] font-semibold uppercase tracking-wider transition-all ${
                   mode === "break"
                     ? "bg-[#2A211C] text-white shadow-sm"
-                    : "bg-white/60 text-[#8d8175]/60 hover:bg-white/80 hover:text-[#2A211C]"
+                    : isBreakLocked
+                      ? "cursor-not-allowed bg-white/40 text-[#8d8175]/35"
+                      : "bg-white/60 text-[#8d8175]/60 hover:bg-white/80 hover:text-[#2A211C]"
                 }`}
               >
                 <Coffee className="mx-auto mb-0.5 size-3.5" strokeWidth={1.8} />

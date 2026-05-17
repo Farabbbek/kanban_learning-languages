@@ -17,7 +17,7 @@ import {
   Quote,
   Sparkles,
 } from "lucide-react";
-import { Sidebar } from "@/components/dashboard/sidebar";
+
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 import toast, { Toaster } from "react-hot-toast";
@@ -347,21 +347,17 @@ export default function SettingsPage() {
   // ── Loading state ──
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F6F2ED]">
-        <Sidebar />
-        <main className="ml-[220px] flex min-h-screen items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <div className="size-6 animate-spin rounded-full border-2 border-[#D4BFAE] border-t-[#B8A99A]" />
-            <p className="text-sm font-medium text-[#8B7B6B]">Loading...</p>
-          </div>
-        </main>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="size-6 animate-spin rounded-full border-2 border-[#D4BFAE] border-t-[#B8A99A]" />
+          <p className="text-sm font-medium text-[#8B7B6B]">Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-[#F6F2ED]">
-      <Sidebar />
       <Toaster
         position="top-right"
         toastOptions={{
@@ -380,7 +376,7 @@ export default function SettingsPage() {
         }}
       />
 
-      <main className="ml-[220px]">
+      <div>
         <div className="mx-auto max-w-xl px-8 pt-12 pb-24">
           {/* ── HERO ── */}
           <motion.div
@@ -483,7 +479,7 @@ export default function SettingsPage() {
             </div>
           </motion.div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

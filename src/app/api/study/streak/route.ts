@@ -11,12 +11,13 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Calculate streak by counting consecutive days with study sessions
+  // Count consecutive days where the user opened a study session.
+  // A session is created on dashboard entry, so today's visit should count
+  // immediately instead of waiting until the tab is closed and marked completed.
   const { data: sessions } = await supabase
     .from("study_sessions")
     .select("session_date")
     .eq("user_id", user.id)
-    .eq("completed", true)
     .order("session_date", { ascending: false });
 
   if (!sessions || sessions.length === 0) {

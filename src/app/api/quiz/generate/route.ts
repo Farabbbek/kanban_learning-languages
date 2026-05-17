@@ -36,25 +36,51 @@ function shuffle<T>(arr: T[]): T[] {
 
 /** Ensure correctAnswer is in options, otherwise insert it */
 function ensureCorrectInOptions(options: string[], correctAnswer: string): string[] {
-  const trimmed = options.map((o) => String(o).trim()).filter(Boolean);
-  const lowerOpts = trimmed.map((o) => o.toLowerCase());
+  const correct = correctAnswer.trim();
+  const seen = new Set<string>();
+  const unique = options
+    .map((o) => String(o).trim())
+    .filter(Boolean)
+    .filter((option) => {
+      const key = option.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  const lowerOpts = unique.map((o) => o.toLowerCase());
 
   // Check if correctAnswer is already in options (case-insensitive)
-  if (lowerOpts.includes(correctAnswer.trim().toLowerCase())) {
+  if (lowerOpts.includes(correct.toLowerCase())) {
     // Replace any duplicate with the exact correctAnswer
-    return trimmed.map((o, i) =>
-      lowerOpts[i] === correctAnswer.trim().toLowerCase() ? correctAnswer.trim() : o
+    return unique.map((o, i) =>
+      lowerOpts[i] === correct.toLowerCase() ? correct : o
     );
   }
 
   // Not found — replace first option with correctAnswer
-  if (trimmed.length >= 1) {
-    trimmed[0] = correctAnswer.trim();
+  if (unique.length >= 1) {
+    unique[0] = correct;
   } else {
-    trimmed.push(correctAnswer.trim());
+    unique.push(correct);
   }
 
-  return trimmed;
+  return unique;
+}
+
+function normalizeOptions(options: unknown, correctAnswer: string): string[] {
+  if (!Array.isArray(options)) return [];
+
+  const normalized = ensureCorrectInOptions(
+    options.map((option) => String(option)),
+    correctAnswer
+  );
+  const firstFour = normalized.slice(0, 4);
+
+  if (!firstFour.some((option) => option.toLowerCase() === correctAnswer.trim().toLowerCase())) {
+    firstFour[0] = correctAnswer.trim();
+  }
+
+  return firstFour;
 }
 
 export async function POST(req: NextRequest) {
@@ -214,16 +240,13 @@ HARD REQUIREMENTS:
     const normalized = (questions as Array<Record<string, unknown>>)
       .filter((q) => {
         if (q.sourceWord) {
-          return q.sourceWord && q.correctAnswer && Array.isArray(q.options) && q.options.length >= 2;
+          return q.sourceWord && q.correctAnswer && Array.isArray(q.options);
         }
-        return q.question && Array.isArray(q.options) && q.options.length >= 2 && q.correctAnswer;
+        return q.question && Array.isArray(q.options) && q.correctAnswer;
       })
       .map((q) => {
         const correctAnswer = String(q.correctAnswer).trim();
-        let options = (q.options as string[]).slice(0, 4).map((o: string) => String(o).trim());
-
-        // Ensure correctAnswer is in options, and then shuffle
-        options = ensureCorrectInOptions(options, correctAnswer);
+        let options = normalizeOptions(q.options, correctAnswer);
         options = shuffle(options);
 
         const base = {
@@ -249,7 +272,8 @@ HARD REQUIREMENTS:
           sourceLanguage: null,
           targetLanguage: null,
         };
-      });
+      })
+      .filter((question) => question.correctAnswer && question.options.length === 4);
 
     if (normalized.length === 0) {
       return NextResponse.json(
